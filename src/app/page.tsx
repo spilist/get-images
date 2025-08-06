@@ -1,7 +1,7 @@
 "use client";
 
 import { Card, CardContent } from "@/components/ui/card";
-import { Coffee, ExternalLink } from "lucide-react";
+import { Coffee, ExternalLink, Github } from "lucide-react";
 import { SettingsDialog } from "@/components/settings-dialog";
 import { SearchPanel } from "@/components/search-panel";
 import { ImageResultsDisplay } from "@/components/image-results-display";
@@ -37,7 +37,7 @@ export default function Home() {
           <div className="mb-4 sm:mb-6">
             <div className="flex justify-between items-start mb-3 sm:mb-4">
               <div className="flex-1 text-center sm:text-left">
-                <h1 className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">Image Scraper</h1>
+                <h1 className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">GetImages</h1>
                 <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block mb-3">
                   Search for images using multiple keywords and create your curated list
                 </p>
@@ -51,6 +51,16 @@ export default function Home() {
               <span className="text-center">
                 Created by <a href="https://stdy.blog" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">배휘동</a>
               </span>
+              <a 
+                href="https://github.com/spilist/get-images" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-primary hover:underline transition-colors"
+              >
+                <Github className="h-3 w-3 sm:h-4 sm:w-4" />
+                GitHub
+                <ExternalLink className="h-2 w-2 sm:h-3 sm:w-3" />
+              </a>
               <a 
                 href="https://coff.ee/steady.study.dev" 
                 target="_blank" 

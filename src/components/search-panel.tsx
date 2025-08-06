@@ -127,7 +127,7 @@ export function SearchPanel({
           className="flex-1 sm:flex-none sm:w-32"
           size="sm"
         >
-          {isLoading ? "Loading..." : "예시 보기"}
+          {isLoading ? "Loading..." : "Examples"}
         </Button>
         {selectedImageCount > 0 && (
           <Button

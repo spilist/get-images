@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Image Scraper",
+  title: "GetImages - Multi-Source Image Search",
   description: "A modern, intelligent web application that enables users to search and collect images from multiple sources with advanced features like automatic API key rotation, smart image validation, and dual search capabilities.",
   icons: {
     icon: "/favicon.ico",

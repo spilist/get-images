@@ -4,7 +4,10 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-This is an image scraper web application built with Next.js 15 and TypeScript. The project provides both a web interface and CLI tools for image scraping, using different APIs for different use cases.
+GetImages is an image scraper web application built with Next.js 15 and TypeScript. The project provides both a web interface and CLI tools for image scraping, using different APIs for different use cases.
+
+**Live Application**: https://get-images.effectiveai.io  
+**Repository**: https://github.com/spilist/get-images
 
 ## Development Commands
 

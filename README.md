@@ -1,160 +1,127 @@
-# Image Scraper - Quick Multi-Source Image Search
+# GetImages - Multi-Source Image Search Tool
 
-A modern, intelligent web application that enables users to search and collect images from multiple sources with advanced features like automatic API key rotation, smart image validation, and dual search capabilities. Built with Next.js 15, TypeScript, and shadcn/ui components, featuring both web interface and CLI tools for comprehensive image discovery workflows.
+A modern, intelligent web application for searching and collecting images from multiple sources. Features advanced capabilities like API key rotation, smart caching, and dual search options for comprehensive image discovery workflows.
 
-*[한국어 버전 보기](README.ko.md)*
+🌐 **Live Demo**: [get-images.effectiveai.io](https://get-images.effectiveai.io)  
+📚 *[한국어 버전 보기](README.ko.md)*
 
-## 🤖 About This Project
+---
 
-This project was developed using AI coding agents with advanced semantic analysis capabilities. The implementation leverages two powerful Model Context Protocol (MCP) servers for enhanced development productivity:
+## ✨ Key Features
 
-- **[ShadCN UI v4 MCP](https://github.com/Jpisnice/shadcn-ui-mcp-server)** - Provides seamless integration with shadcn/ui component library, enabling rapid UI development with consistent design patterns. If you use Claude Code, you can use `@agent-shadcn-ui-builder` to modify the UI components.
-- **[Serena MCP](https://github.com/oraios/serena)** - Advanced semantic code analysis and intelligent editing capabilities for TypeScript/JavaScript projects
+- **Multi-keyword Search**: Search multiple terms simultaneously
+- **Dual API Support**: Web interface (SERPAPI) + CLI tool (DuckDuckGo)  
+- **Smart Caching**: 24-hour cache system reduces costs and improves speed
+- **Flexible API Keys**: Use default keys or configure your own
+- **Responsive Design**: Optimized for desktop and mobile
+- **Export Functionality**: Easy copy/export of results
 
-### Learning More About These Tools
-
-For developers interested in using Serena MCP effectively, we recommend this comprehensive guide: [Serena MCP 개요와 설치, Claude Code 통합](https://hansdev.kr/tech/serena-mcp/) - A detailed blog post explaining how to maximize productivity with Serena's semantic analysis features.
-
-## ✨ Features
-
-- **Multi-keyword Image Search**: Search for multiple keywords simultaneously
-- **Dual API Support**: Web interface (SERPAPI) + CLI tool (DuckDuckGo)
-- **Intelligent Caching**: 24-hour in-memory cache reduces API calls and improves performance
-- **Flexible API Key Management**: Use provided key or configure your own
-- **Smart Image Validation**: Automatic fallback for broken images
-- **Responsive Design**: Works on desktop and mobile devices
-- **Export Functionality**: Copy results for external use
+---
 
 ## 🚀 Quick Start
 
-### Web Application
+### Option 1: Web Application (Recommended)
 
-1. **Clone the repository**:
-   ```bash
-   git clone https://github.com/spilist/image-scraper.git
-   cd image-scraper
-   ```
+```bash
+# Clone and install
+git clone https://github.com/spilist/get-images.git
+cd get-images
+pnpm install
 
-2. **Install dependencies**:
-   ```bash
-   pnpm install
-   ```
+# Start development server (uses default SERPAPI key)
+pnpm dev
 
-3. **Start immediately** (uses default SERPAPI key):
-   ```bash
-   pnpm dev
-   ```
+# Open http://localhost:3000
+```
 
-4. **Open your browser**: Visit [http://localhost:3000](http://localhost:3000)
+### Option 2: CLI Script (No API Key Required)
 
-Configure SERPAPI key for testing.
+```bash
+# Install Python dependencies
+pip install -r requirements.txt
 
-### CLI Script
+# Modify scripts/keywords.txt as you want
 
-For batch processing or offline usage:
+# Run CLI script
+python scripts/scraper.py
+```
 
-1. **Install Python dependencies**:
-   ```bash
-   pip install -r requirements.txt
-   ```
+> **⚠️ IMPORTANT**: The CLI script will display a disclaimer about image usage rights. It is your responsibility to verify copyright permissions and licensing before using any images found through this tool. Additionally, many image links may not work outside their original websites due to hotlinking protection - always test each link in your target environment.
 
-2. **Run the CLI script**:
-   ```bash
-   python scripts/scraper.py
-   ```
-
-The CLI uses DuckDuckGo search (no API key required).
+---
 
 ## ⚙️ Configuration
 
-### Using Your Own SERPAPI Key
+### SERPAPI Setup (Web Interface)
 
-Here's how to get your own API key:
-
-1. **Sign up at SERPAPI**: Visit [https://serpapi.com/manage-api-key](https://serpapi.com/manage-api-key)
-2. **Copy your API key**
-3. **Configure in the app**: Use the settings UI to enter your key
-4. **Or set environment variable**:
+1. **Get API Key**: Sign up at [serpapi.com/manage-api-key](https://serpapi.com/manage-api-key)
+2. **Configure in App**: Use settings UI to enter your key
+3. **Or Set Environment Variables**:
    ```bash
-   SERPAPI_KEY=your_api_key_here pnpm dev
+   SERPAPI_KEY=your_primary_key_here
+   SERPAPI_KEY2=your_secondary_key_here  # Optional: enables auto-rotation
    ```
 
-### Environment Variables
+**API Key Rotation**: Configure multiple keys for automatic load balancing and rate limit distribution.
 
-```bash
-# Primary SERPAPI key (required for default functionality)
-SERPAPI_KEY=your_primary_serpapi_key_here
+---
 
-# Secondary SERPAPI key (optional, enables automatic rotation)
-SERPAPI_KEY2=your_secondary_serpapi_key_here
-```
-
-**API Key Rotation**: When both `SERPAPI_KEY` and `SERPAPI_KEY2` are configured, the application automatically rotates between them for load balancing and rate limit distribution. This helps prevent hitting API limits on a single key during heavy usage.
-
-## ⚡ Performance & Caching
+## ⚡ Performance Features
 
 ### Intelligent Caching System
 
-The application features an advanced in-memory caching system that significantly improves performance and reduces API costs:
+Our advanced caching system delivers significant performance improvements:
 
-**Key Benefits:**
-- **Instant Results**: Cached searches return in under 10ms
-- **Cost Savings**: Eliminates duplicate API calls for repeated searches  
-- **Better Experience**: No waiting time for previously searched queries
-- **Rate Limit Protection**: Reduces API usage to prevent hitting limits
+| Feature | Benefit |
+|---------|---------|
+| **Instant Results** | Cached searches return in <10ms |
+| **Cost Savings** | Eliminates duplicate API calls |
+| **Rate Limit Protection** | Reduces API usage |
+| **Smart Keys** | Considers query + result count + API key |
 
-**How It Works:**
-- **24-Hour Cache**: Search results are cached for 24 hours
-- **Smart Keys**: Cache considers query, result count, and API key
-- **Auto-Cleanup**: Expired entries are automatically removed
-- **Memory Efficient**: Limits cache size to prevent memory issues
+**Example**: Popular searches like "김치찌개" load instantly after first search!
 
-**Cache Performance:**
-- Cache hits are logged in the console for monitoring
-- No impact on API functionality if caching fails
-- Works seamlessly with API key rotation
-
-This means popular searches like "김치찌개" or "삼계탕" will load instantly after the first search, saving both time and API costs!
+---
 
 ## 🛠️ Development
 
 ```bash
-# Development server with hot reload
+# Development with hot reload
 pnpm dev
 
-# Build for production
+# Production build
 pnpm build
 
-# Start production server
+# Production server
 pnpm start
 
-# Lint code
+# Code linting
 pnpm lint
 ```
 
-## 📁 Project Structure
+### Project Structure
 
 ```
-image-scraper-web/
+get-images/
 ├── src/
 │   ├── app/                 # Next.js App Router
 │   │   ├── api/scraper/     # API endpoint (SERPAPI)
-│   │   ├── page.tsx         # Main application page
-│   │   └── layout.tsx       # Root layout
+│   │   └── page.tsx         # Main application
 │   ├── components/ui/       # shadcn/ui components
-│   ├── lib/                 # Utilities
-│   └── types/               # TypeScript definitions
+│   ├── lib/                 # Utilities & caching
+│   └── hooks/               # React hooks
 ├── scripts/
 │   └── scraper.py          # CLI script (DuckDuckGo)
-├── requirements.txt        # Python dependencies
-└── package.json           # Node.js dependencies
+└── requirements.txt        # Python dependencies
 ```
+
+---
 
 ## 🔧 API Usage
 
 ### Web API Endpoint: `/api/scraper`
 
-**Single keyword search**:
+**Single keyword search:**
 ```javascript
 const response = await fetch('/api/scraper', {
   method: 'POST',
@@ -166,13 +133,13 @@ const response = await fetch('/api/scraper', {
 });
 ```
 
-**Multiple keywords search**:
+**Multiple keywords search:**
 ```javascript
 const response = await fetch('/api/scraper', {
   method: 'POST',
   headers: { 
     'Content-Type': 'application/json',
-    'X-API-Key': 'your_serpapi_key' // Optional: override default key
+    'X-API-Key': 'your_serpapi_key' // Optional override
   },
   body: JSON.stringify({
     keywords: ["삼계탕", "김치찌개", "된장찌개"],
@@ -182,41 +149,90 @@ const response = await fetch('/api/scraper', {
 });
 ```
 
+---
+
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
 
-1. **Connect your repository** to Vercel
-2. **Set environment variable**:
+1. Connect repository to Vercel
+2. Set environment variables:
    - `SERPAPI_KEY`: Your default SERPAPI key
-3. **Deploy**: Automatic deployment on push
+   - `SERPAPI_KEY2`: Optional secondary key
+3. Deploy automatically on push
 
 ### Other Platforms
 
-The app is a standard Next.js application and can be deployed on any platform supporting Node.js.
+Standard Next.js application - compatible with any Node.js hosting platform.
+
+---
+
+## 🤖 AI Development
+
+This project leverages advanced AI coding agents with semantic analysis:
+
+- **[ShadCN UI v4 MCP](https://github.com/Jpisnice/shadcn-ui-mcp-server)** - Rapid UI development with consistent design patterns
+- **[Serena MCP](https://github.com/oraios/serena)** - Advanced semantic code analysis for TypeScript/JavaScript
+
+**Learn More**: [Serena MCP Guide](https://hansdev.kr/tech/serena-mcp/) - Comprehensive blog post on maximizing productivity with semantic analysis.
+
+---
+
+## ⚠️ Image Usage Disclaimer
+
+**IMPORTANT**: This tool provides image links for reference purposes only. Users are responsible for:
+
+- ✅ **Copyright Verification**: Check image licensing and permissions
+- ✅ **Source Terms**: Review terms of use from original websites  
+- ✅ **Usage Rights**: Verify if images can be used outside their original context
+- ✅ **Commercial Use**: Ensure proper licensing for commercial applications
+
+### 🔗 Technical Limitations
+
+**Image Link Accessibility**: Many image links may NOT work when used outside their original websites due to:
+- **Hotlinking Protection**: Websites block direct image access from external domains
+- **Referrer Checks**: Images may only load when accessed from the source website
+- **Authentication Requirements**: Some images require login or special access
+
+**Solution**: Always test each image link in your target environment. For reliable usage, download and host images yourself rather than using direct links.
+
+**Best Practices**:
+- Always contact image owners when in doubt
+- Consider using Creative Commons or royalty-free images
+- Attribute sources when required
+- Keep records of usage permissions
+
+This tool does not grant any rights to use the images found. All copyright and intellectual property rights remain with their respective owners.
+
+---
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a feature branch: `git checkout -b feature-name`
-3. Make your changes
-4. Test thoroughly
-5. Submit a pull request
+2. Create feature branch: `git checkout -b feature-name`  
+3. Make changes and test thoroughly
+4. Submit pull request
+
+---
 
 ## 📄 License
 
-This project is open source and available under the [MIT License](LICENSE).
+Open source under the [MIT License](LICENSE).
 
-## ☕ Support This Project
+---
 
-If you find this project helpful, consider supporting its development:
+## 💝 Support
+
+Find this project helpful? Consider supporting its development:
 
 **[☕ Buy me a coffee](https://coff.ee/steady.study.dev)**
 
 Created by [배휘동](https://stdy.blog)
 
-## 🆘 Help & Documentation
+---
 
-- **Issues**: Report bugs or request features via GitHub Issues
-- **Documentation**: Check `CLAUDE.md` for development guidelines
-- **API Documentation**: Visit [SERPAPI docs](https://serpapi.com/search-api) for API details
+## 📚 Resources
+
+- **Issues & Features**: [GitHub Issues](https://github.com/spilist/get-images/issues)
+- **Development Guide**: Check `CLAUDE.md` for guidelines  
+- **API Documentation**: [SERPAPI Docs](https://serpapi.com/search-api)

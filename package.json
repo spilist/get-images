@@ -1,7 +1,12 @@
 {
-  "name": "image-scraper-web",
+  "name": "get-images",
   "version": "0.1.0",
   "private": true,
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/spilist/get-images.git"
+  },
+  "homepage": "https://get-images.effectiveai.io",
   "scripts": {
     "dev": "next dev --turbopack",
     "build": "next build",
