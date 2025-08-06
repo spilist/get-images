@@ -70,98 +70,101 @@ def search_multiple_keywords(keywords, max_keywords=10, max_results_per_keyword=
         'results': results
     }
 
-def handler(request):
-    from http import HTTPStatus
-    from urllib.parse import parse_qs
-    import json as json_module
-    
-    # Handle CORS preflight requests
-    if request.method == 'OPTIONS':
-        return {
-            'statusCode': 200,
-            'headers': {
-                'Access-Control-Allow-Origin': '*',
-                'Access-Control-Allow-Methods': 'POST, OPTIONS',
-                'Access-Control-Allow-Headers': 'Content-Type'
-            },
-            'body': ''
-        }
-    
-    if request.method != 'POST':
-        return {
-            'statusCode': 405,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            'body': json_module.dumps({
-                'success': False,
-                'error': 'Method not allowed'
-            }, ensure_ascii=False)
-        }
-    
-    try:
-        # Parse request body
-        if hasattr(request, 'get_json'):
-            request_data = request.get_json()
-        elif hasattr(request, 'json'):
-            request_data = request.json
-        else:
-            body = request.body if hasattr(request, 'body') else request.data
-            if isinstance(body, bytes):
-                body = body.decode('utf-8')
-            request_data = json_module.loads(body)
-        
-        # 단일 쿼리 처리
-        if 'query' in request_data:
-            query = request_data['query']
-            max_results = request_data.get('max_results', 3)
+from http.server import BaseHTTPRequestHandler
+from urllib.parse import urlparse, parse_qs
+
+class handler(BaseHTTPRequestHandler):
+    def do_POST(self):
+        try:
+            # Get request body
+            content_length = int(self.headers.get('Content-Length', 0))
+            if content_length > 0:
+                post_data = self.rfile.read(content_length)
+                request_data = json.loads(post_data.decode('utf-8'))
+            else:
+                request_data = {}
             
-            result = find_images_with_ddgs(query, max_results)
+            # Handle single query
+            if 'query' in request_data:
+                query = request_data['query']
+                max_results = request_data.get('max_results', 3)
+                
+                result = find_images_with_ddgs(query, max_results)
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                
+                response = json.dumps(result, ensure_ascii=False, indent=2)
+                self.wfile.write(response.encode('utf-8'))
+                
+            # Handle multiple keywords
+            elif 'keywords' in request_data:
+                keywords = request_data['keywords']
+                max_keywords = request_data.get('max_keywords', 10)
+                max_results_per_keyword = request_data.get('max_results_per_keyword', 3)
+                
+                if not isinstance(keywords, list):
+                    raise ValueError("keywords must be a list")
+                
+                result = search_multiple_keywords(keywords, max_keywords, max_results_per_keyword)
+                
+                self.send_response(200)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                
+                response = json.dumps(result, ensure_ascii=False, indent=2)
+                self.wfile.write(response.encode('utf-8'))
+                
+            else:
+                # Bad request
+                self.send_response(400)
+                self.send_header('Content-Type', 'application/json')
+                self.send_header('Access-Control-Allow-Origin', '*')
+                self.end_headers()
+                
+                error_response = {
+                    'success': False,
+                    'error': 'Missing required parameter: query or keywords'
+                }
+                response = json.dumps(error_response, ensure_ascii=False, indent=2)
+                self.wfile.write(response.encode('utf-8'))
+                
+        except json.JSONDecodeError:
+            self.send_response(400)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
             
-            return {
-                'statusCode': 200,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json_module.dumps(result, ensure_ascii=False, indent=2)
-            }
-            
-        # 다중 키워드 처리
-        elif 'keywords' in request_data:
-            keywords = request_data['keywords']
-            max_keywords = request_data.get('max_keywords', 10)
-            max_results_per_keyword = request_data.get('max_results_per_keyword', 3)
-            
-            if not isinstance(keywords, list):
-                raise ValueError("keywords must be a list")
-            
-            result = search_multiple_keywords(keywords, max_keywords, max_results_per_keyword)
-            
-            return {
-                'statusCode': 200,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json_module.dumps(result, ensure_ascii=False, indent=2)
-            }
-            
-        else:
-            # 잘못된 요청
             error_response = {
                 'success': False,
-                'error': 'Missing required parameter: query or keywords'
+                'error': 'Invalid JSON in request body'
             }
-            return {
-                'statusCode': 400,
-                'headers': {
-                    'Content-Type': 'application/json',
-                    'Access-Control-Allow-Origin': '*'
-                },
-                'body': json_module.dumps(error_response, ensure_ascii=False, indent=2)
+            response = json.dumps(error_response, ensure_ascii=False, indent=2)
+            self.wfile.write(response.encode('utf-8'))
+            
+        except Exception as e:
+            self.send_response(500)
+            self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
+            self.end_headers()
+            
+            error_response = {
+                'success': False,
+                'error': f'Internal server error: {str(e)}'
             }
+            response = json.dumps(error_response, ensure_ascii=False, indent=2)
+            self.wfile.write(response.encode('utf-8'))
+
+    def do_OPTIONS(self):
+        # CORS preflight handling
+        self.send_response(200)
+        self.send_header('Access-Control-Allow-Origin', '*')
+        self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
+        self.send_header('Access-Control-Allow-Headers', 'Content-Type')
+        self.end_headers()
             
     except json_module.JSONDecodeError:
         error_response = {
