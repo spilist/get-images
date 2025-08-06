@@ -2,6 +2,17 @@
 
 A modern web application for searching and collecting images from multiple sources. Built with Next.js 15, TypeScript, and shadcn/ui components.
 
+## 🤖 About This Project
+
+This project was developed using AI coding agents with advanced semantic analysis capabilities. The implementation leverages two powerful Model Context Protocol (MCP) servers for enhanced development productivity:
+
+- **[ShadCN UI v4 MCP](https://github.com/Jpisnice/shadcn-ui-mcp-server)** - Provides seamless integration with shadcn/ui component library, enabling rapid UI development with consistent design patterns. If you use Claude Code, you can use `@agent-shadcn-ui-builder` to modify the UI components.
+- **[Serena MCP](https://github.com/oraios/serena)** - Advanced semantic code analysis and intelligent editing capabilities for TypeScript/JavaScript projects
+
+### Learning More About These Tools
+
+For developers interested in using Serena MCP effectively, we recommend this comprehensive guide: [Serena MCP 개요와 설치, Claude Code 통합](https://hansdev.kr/tech/serena-mcp/) - A detailed blog post explaining how to maximize productivity with Serena's semantic analysis features.
+
 ## ✨ Features
 
 - **Multi-keyword Image Search**: Search for multiple keywords simultaneously
@@ -68,9 +79,14 @@ Here's how to get your own API key:
 ### Environment Variables
 
 ```bash
-# Optional: Set your own default SERPAPI key
-SERPAPI_KEY=your_serpapi_key_here
+# Primary SERPAPI key (required for default functionality)
+SERPAPI_KEY=your_primary_serpapi_key_here
+
+# Secondary SERPAPI key (optional, enables automatic rotation)
+SERPAPI_KEY2=your_secondary_serpapi_key_here
 ```
+
+**API Key Rotation**: When both `SERPAPI_KEY` and `SERPAPI_KEY2` are configured, the application automatically rotates between them for load balancing and rate limit distribution. This helps prevent hitting API limits on a single key during heavy usage.
 
 ## 🛠️ Development
 

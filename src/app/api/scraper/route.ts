@@ -32,9 +32,26 @@ interface SerpAPIResponse {
   images_results?: SerpAPIImageResult[]
 }
 
+// Simple counter for API key rotation
+let apiKeyRotationCounter = 0;
+
+function getEnvironmentApiKey(): string | undefined {
+  const key1 = process.env.SERPAPI_KEY;
+  const key2 = process.env.SERPAPI_KEY2;
+  
+  // If both keys are available, rotate between them
+  if (key1 && key2) {
+    apiKeyRotationCounter = (apiKeyRotationCounter + 1) % 2;
+    return apiKeyRotationCounter === 0 ? key1 : key2;
+  }
+  
+  // Otherwise, return whichever key is available
+  return key1 || key2;
+}
+
 async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, userApiKey?: string): Promise<SearchResult> {
-  // Use user-provided API key if available, otherwise fall back to environment
-  const apiKey = userApiKey || process.env.SERPAPI_KEY
+  // Use user-provided API key if available, otherwise fall back to environment keys with rotation
+  const apiKey = userApiKey || getEnvironmentApiKey()
   
   if (!apiKey) {
     return {

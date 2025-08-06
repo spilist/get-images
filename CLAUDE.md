@@ -49,6 +49,7 @@ The project uses different image search APIs for different contexts:
 
 ### Key Features
 - **API Key Flexibility**: Users can provide their own SERPAPI key or use the environment default
+- **API Key Rotation**: Automatic rotation between multiple environment keys for load balancing
 - **Immediate Usability**: Works out-of-the-box with environment SERPAPI_KEY
 - **Dual Usage**: Web interface for interactive use, CLI for batch processing
 - **Error Handling**: Graceful fallbacks and user feedback
@@ -64,7 +65,8 @@ The project uses different image search APIs for different contexts:
 #### Web Application (SERPAPI)
 1. Get API key from https://serpapi.com/manage-api-key
 2. Set `SERPAPI_KEY` environment variable for default usage
-3. Users can optionally override with their own key in the UI
+3. Optionally set `SERPAPI_KEY2` for automatic key rotation and load balancing
+4. Users can optionally override with their own key in the UI
 
 #### CLI Script (DuckDuckGo)
 1. Install dependencies: `pip install -r requirements.txt`
