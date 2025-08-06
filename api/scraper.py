@@ -71,7 +71,6 @@ def search_multiple_keywords(keywords, max_keywords=10, max_results_per_keyword=
     }
 
 from http.server import BaseHTTPRequestHandler
-from urllib.parse import urlparse, parse_qs
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
@@ -165,59 +164,3 @@ class handler(BaseHTTPRequestHandler):
         self.send_header('Access-Control-Allow-Methods', 'POST, OPTIONS')
         self.send_header('Access-Control-Allow-Headers', 'Content-Type')
         self.end_headers()
-            
-    except json_module.JSONDecodeError:
-        error_response = {
-            'success': False,
-            'error': 'Invalid JSON in request body'
-        }
-        return {
-            'statusCode': 400,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            'body': json_module.dumps(error_response, ensure_ascii=False, indent=2)
-        }
-        
-    except Exception as e:
-        error_response = {
-            'success': False,
-            'error': f'Internal server error: {str(e)}'
-        }
-        return {
-            'statusCode': 500,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            'body': json_module.dumps(error_response, ensure_ascii=False, indent=2)
-        }
-            
-    except json.JSONDecodeError:
-        error_response = {
-            'success': False,
-            'error': 'Invalid JSON in request body'
-        }
-        return {
-            'statusCode': 400,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            'body': json.dumps(error_response, ensure_ascii=False, indent=2)
-        }
-        
-    except Exception as e:
-        error_response = {
-            'success': False,
-            'error': f'Internal server error: {str(e)}'
-        }
-        return {
-            'statusCode': 500,
-            'headers': {
-                'Content-Type': 'application/json',
-                'Access-Control-Allow-Origin': '*'
-            },
-            'body': json.dumps(error_response, ensure_ascii=False, indent=2)
-        }
