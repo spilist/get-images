@@ -34,3 +34,15 @@ export interface SearchState {
   results: MultipleKeywordsResponse | null;
   selectedImages: SelectedImages;
 }
+
+export interface ApiKeyConfig {
+  apiKey: string;
+  source: 'environment' | 'user';
+  isValid: boolean;
+}
+
+export interface ApiKeyState {
+  config: ApiKeyConfig | null;
+  isLoading: boolean;
+  error: string | null;
+}

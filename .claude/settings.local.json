@@ -25,7 +25,10 @@
       "mcp__serena__replace_regex",
       "mcp__serena__list_memories",
       "WebFetch(domain:pypi.org)",
-      "WebFetch(domain:www.npmjs.com)"
+      "WebFetch(domain:www.npmjs.com)",
+      "mcp__shadcn__get_component",
+      "Bash(npm install:*)",
+      "Bash(pkill:*)"
     ],
     "deny": []
   }

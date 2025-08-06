@@ -1,36 +1,170 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Image Scraper Web
 
-## Getting Started
+A modern web application for searching and collecting images from multiple sources. Built with Next.js 15, TypeScript, and shadcn/ui components.
 
-First, run the development server:
+## ✨ Features
+
+- **Multi-keyword Image Search**: Search for multiple keywords simultaneously
+- **Dual API Support**: Web interface (SERPAPI) + CLI tool (DuckDuckGo)
+- **Flexible API Key Management**: Use provided key or configure your own
+- **Smart Image Validation**: Automatic fallback for broken images
+- **Responsive Design**: Works on desktop and mobile devices
+- **Export Functionality**: Copy results for external use
+
+## 🚀 Quick Start
+
+### Web Application
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/spilist/image-scraper.git
+   cd image-scraper
+   ```
+
+2. **Install dependencies**:
+   ```bash
+   pnpm install
+   ```
+
+3. **Start immediately** (uses default SERPAPI key):
+   ```bash
+   pnpm dev
+   ```
+
+4. **Open your browser**: Visit [http://localhost:3000](http://localhost:3000)
+
+Configure SERPAPI key for testing.
+
+### CLI Script
+
+For batch processing or offline usage:
+
+1. **Install Python dependencies**:
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+2. **Run the CLI script**:
+   ```bash
+   python scripts/scraper.py
+   ```
+
+The CLI uses DuckDuckGo search (no API key required).
+
+## ⚙️ Configuration
+
+### Using Your Own SERPAPI Key
+
+Here's how to get your own API key:
+
+1. **Sign up at SERPAPI**: Visit [https://serpapi.com/manage-api-key](https://serpapi.com/manage-api-key)
+2. **Copy your API key**
+3. **Configure in the app**: Use the settings UI to enter your key
+4. **Or set environment variable**:
+   ```bash
+   SERPAPI_KEY=your_api_key_here pnpm dev
+   ```
+
+### Environment Variables
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+# Optional: Set your own default SERPAPI key
+SERPAPI_KEY=your_serpapi_key_here
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 🛠️ Development
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+# Development server with hot reload
+pnpm dev
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+# Build for production
+pnpm build
 
-## Learn More
+# Start production server
+pnpm start
 
-To learn more about Next.js, take a look at the following resources:
+# Lint code
+pnpm lint
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📁 Project Structure
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```
+image-scraper-web/
+├── src/
+│   ├── app/                 # Next.js App Router
+│   │   ├── api/scraper/     # API endpoint (SERPAPI)
+│   │   ├── page.tsx         # Main application page
+│   │   └── layout.tsx       # Root layout
+│   ├── components/ui/       # shadcn/ui components
+│   ├── lib/                 # Utilities
+│   └── types/               # TypeScript definitions
+├── scripts/
+│   └── scraper.py          # CLI script (DuckDuckGo)
+├── requirements.txt        # Python dependencies
+└── package.json           # Node.js dependencies
+```
 
-## Deploy on Vercel
+## 🔧 API Usage
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+### Web API Endpoint: `/api/scraper`
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Single keyword search**:
+```javascript
+const response = await fetch('/api/scraper', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    query: "삼계탕",
+    max_results: 5
+  })
+});
+```
+
+**Multiple keywords search**:
+```javascript
+const response = await fetch('/api/scraper', {
+  method: 'POST',
+  headers: { 
+    'Content-Type': 'application/json',
+    'X-API-Key': 'your_serpapi_key' // Optional: override default key
+  },
+  body: JSON.stringify({
+    keywords: ["삼계탕", "김치찌개", "된장찌개"],
+    max_keywords: 10,
+    max_results_per_keyword: 3
+  })
+});
+```
+
+## 🚀 Deployment
+
+### Vercel (Recommended)
+
+1. **Connect your repository** to Vercel
+2. **Set environment variable**:
+   - `SERPAPI_KEY`: Your default SERPAPI key
+3. **Deploy**: Automatic deployment on push
+
+### Other Platforms
+
+The app is a standard Next.js application and can be deployed on any platform supporting Node.js.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create a feature branch: `git checkout -b feature-name`
+3. Make your changes
+4. Test thoroughly
+5. Submit a pull request
+
+## 📄 License
+
+This project is open source and available under the [MIT License](LICENSE).
+
+## 🆘 Support
+
+- **Issues**: Report bugs or request features via GitHub Issues
+- **Documentation**: Check `CLAUDE.md` for development guidelines
+- **API Documentation**: Visit [SERPAPI docs](https://serpapi.com/search-api) for API details

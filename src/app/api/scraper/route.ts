@@ -32,8 +32,9 @@ interface SerpAPIResponse {
   images_results?: SerpAPIImageResult[]
 }
 
-async function searchImagesWithSerpAPI(query: string, maxResults: number = 3): Promise<SearchResult> {
-  const apiKey = process.env.SERPAPI_KEY
+async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, userApiKey?: string): Promise<SearchResult> {
+  // Use user-provided API key if available, otherwise fall back to environment
+  const apiKey = userApiKey || process.env.SERPAPI_KEY
   
   if (!apiKey) {
     return {
@@ -41,7 +42,7 @@ async function searchImagesWithSerpAPI(query: string, maxResults: number = 3): P
       query,
       count: 0,
       images: [],
-      error: 'SERPAPI_KEY environment variable is not configured'
+      error: 'No API key available. Please configure your SERPAPI key in settings or contact administrator.'
     }
   }
 
@@ -98,14 +99,15 @@ async function searchImagesWithSerpAPI(query: string, maxResults: number = 3): P
 async function searchMultipleKeywords(
   keywords: string[], 
   maxKeywords: number = 10, 
-  maxResultsPerKeyword: number = 3
+  maxResultsPerKeyword: number = 3,
+  userApiKey?: string
 ): Promise<MultipleKeywordsResponse> {
   const limitedKeywords = keywords.slice(0, maxKeywords)
   const results: Record<string, SearchResult> = {}
 
   // Process keywords sequentially to avoid rate limiting
   for (const keyword of limitedKeywords) {
-    results[keyword] = await searchImagesWithSerpAPI(keyword, maxResultsPerKeyword)
+    results[keyword] = await searchImagesWithSerpAPI(keyword, maxResultsPerKeyword, userApiKey)
     
     // Add small delay between requests to be respectful to the API
     if (limitedKeywords.indexOf(keyword) < limitedKeywords.length - 1) {
@@ -124,6 +126,9 @@ export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
     
+    // Extract user API key from headers or body
+    const userApiKey = request.headers.get('X-API-Key') || body.api_key || undefined
+    
     // Handle single query
     if ('query' in body) {
       const { query, max_results = 3 } = body
@@ -135,7 +140,7 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
-      const result = await searchImagesWithSerpAPI(query, max_results)
+      const result = await searchImagesWithSerpAPI(query, max_results, userApiKey)
       
       return NextResponse.json(result, {
         headers: {
@@ -161,7 +166,7 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
-      const result = await searchMultipleKeywords(keywords, max_keywords, max_results_per_keyword)
+      const result = await searchMultipleKeywords(keywords, max_keywords, max_results_per_keyword, userApiKey)
       
       return NextResponse.json(result, {
         headers: {

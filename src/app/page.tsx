@@ -11,6 +11,8 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
 import { Copy, Search, AlertCircle, CheckCircle2 } from "lucide-react";
 import { MultipleKeywordsResponse, ImageResult, SelectedImages, SearchState } from "@/types/api";
+import { SettingsDialog } from "@/components/settings-dialog";
+import { useApiKey } from "@/hooks/use-api-key";
 
 export default function Home() {
   const [keywordsInput, setKeywordsInput] = useState("");
@@ -22,6 +24,7 @@ export default function Home() {
   });
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
+  const { config: apiKeyConfig, hasUserKey, updateConfig } = useApiKey();
 
   const parseKeywords = (input: string): string[] => {
     return input
@@ -189,15 +192,27 @@ export default function Home() {
     setFailedImages(new Set()); // Clear failed images for new search
 
     try {
+      // Prepare request body with optional API key
+      const requestBody: {
+        keywords: string[];
+        max_results_per_keyword: number;
+        api_key?: string;
+      } = {
+        keywords,
+        max_results_per_keyword: 5
+      };
+
+      // Include user API key if available and valid
+      if (apiKeyConfig?.source === 'user' && apiKeyConfig.isValid && apiKeyConfig.apiKey) {
+        requestBody.api_key = apiKeyConfig.apiKey;
+      }
+
       const response = await fetch("/api/scraper", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          keywords,
-          max_results_per_keyword: 5
-        })
+        body: JSON.stringify(requestBody)
       });
 
       if (!response.ok) {
@@ -363,8 +378,16 @@ export default function Home() {
       <div className="p-4">
         <div className="max-w-7xl mx-auto">
           <div className="mb-6 text-center">
-            <h1 className="text-3xl font-bold mb-2">Image Search & Preview</h1>
-            <p className="text-muted-foreground">Search for images using multiple keywords and create your curated list</p>
+            <div className="flex justify-between items-start">
+              <div></div> {/* Empty div for spacing */}
+              <div className="flex-1">
+                <h1 className="text-3xl font-bold mb-2">Image Search & Preview</h1>
+                <p className="text-muted-foreground">Search for images using multiple keywords and create your curated list</p>
+              </div>
+              <div className="flex items-start gap-2">
+                <SettingsDialog onApiKeyChange={updateConfig} />
+              </div>
+            </div>
           </div>
           
           {/* Search Section */}
@@ -377,6 +400,13 @@ export default function Home() {
                     <span className="text-sm font-medium">Keywords (max 10)</span>
                     <Badge variant="outline" className="text-xs">
                       {parseKeywords(keywordsInput).length}/10
+                    </Badge>
+                    <Badge 
+                      variant={hasUserKey ? "default" : "secondary"} 
+                      className="text-xs"
+                      title={hasUserKey ? "Using your personal SERPAPI key" : "Using environment SERPAPI key"}
+                    >
+                      {hasUserKey ? "Personal Key" : "Env Key"}
                     </Badge>
                   </div>
                   <Textarea
