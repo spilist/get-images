@@ -21,6 +21,7 @@ export default function Home() {
     selectedImages: {}
   });
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
+  const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
   const parseKeywords = (input: string): string[] => {
     return input
@@ -43,6 +44,7 @@ export default function Home() {
     }
 
     setSearchState(prev => ({ ...prev, isLoading: true, error: null }));
+    setFailedImages(new Set()); // Clear failed images for new search
 
     try {
       const response = await fetch("/api/scraper", {
@@ -87,6 +89,10 @@ export default function Home() {
         error: err instanceof Error ? err.message : "Search failed"
       }));
     }
+  };
+
+  const handleImageError = (imageUrl: string) => {
+    setFailedImages(prev => new Set([...prev, imageUrl]));
   };
 
   const selectImage = (keyword: string, image: ImageResult) => {
@@ -214,36 +220,42 @@ export default function Home() {
                         </div>
                         
                         {result.success && result.images.length > 0 ? (
-                          <div className="grid grid-cols-3 gap-2">
-                            {result.images.map((image, index) => (
-                              <button
-                                key={index}
-                                onClick={() => selectImage(keyword, image)}
-                                className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
-                                  searchState.selectedImages[keyword]?.url === image.url
-                                    ? "border-primary bg-primary/5"
-                                    : "border-border hover:border-primary/50"
-                                }`}
-                              >
-                                <Image
-                                  src={image.url}
-                                  alt={image.title}
-                                  fill
-                                  className="object-cover"
-                                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
-                                  onError={(e) => {
-                                    const target = e.target as HTMLImageElement;
-                                    target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100' viewBox='0 0 100 100'%3E%3Crect width='100' height='100' fill='%23f3f4f6'/%3E%3Ctext x='50' y='50' font-family='Arial' font-size='12' fill='%236b7280' text-anchor='middle' dy='.3em'%3ENo Image%3C/text%3E%3C/svg%3E";
-                                  }}
-                                />
-                                {searchState.selectedImages[keyword]?.url === image.url && (
-                                  <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
-                                    <CheckCircle2 className="h-6 w-6 text-primary bg-background rounded-full" />
-                                  </div>
-                                )}
-                              </button>
-                            ))}
-                          </div>
+                          (() => {
+                            const availableImages = result.images.filter(image => !failedImages.has(image.url));
+                            return availableImages.length > 0 ? (
+                              <div className="grid grid-cols-3 gap-2">
+                                {availableImages.map((image, index) => (
+                                  <button
+                                    key={index}
+                                    onClick={() => selectImage(keyword, image)}
+                                    className={`relative aspect-square rounded-lg overflow-hidden border-2 transition-colors ${
+                                      searchState.selectedImages[keyword]?.url === image.url
+                                        ? "border-primary bg-primary/5"
+                                        : "border-border hover:border-primary/50"
+                                    }`}
+                                  >
+                                    <Image
+                                      src={image.url}
+                                      alt={image.title}
+                                      fill
+                                      className="object-cover"
+                                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 33vw, 25vw"
+                                      onError={() => handleImageError(image.url)}
+                                    />
+                                    {searchState.selectedImages[keyword]?.url === image.url && (
+                                      <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
+                                        <CheckCircle2 className="h-6 w-6 text-primary bg-background rounded-full" />
+                                      </div>
+                                    )}
+                                  </button>
+                                ))}
+                              </div>
+                            ) : (
+                              <div className="text-sm text-muted-foreground p-4 text-center bg-muted rounded-lg">
+                                Images unavailable - all sources failed to load
+                              </div>
+                            );
+                          })()
                         ) : (
                           <div className="text-sm text-muted-foreground p-4 text-center bg-muted rounded-lg">
                             {result.error || "No images found"}
@@ -300,17 +312,20 @@ export default function Home() {
                           {image.url}
                         </div>
                         <div className="flex items-center gap-2">
-                          <Image
-                            src={image.url}
-                            alt={image.title}
-                            width={32}
-                            height={32}
-                            className="rounded object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%23f3f4f6'/%3E%3C/svg%3E";
-                            }}
-                          />
+                          {!failedImages.has(image.url) ? (
+                            <Image
+                              src={image.url}
+                              alt={image.title}
+                              width={32}
+                              height={32}
+                              className="rounded object-cover"
+                              onError={() => handleImageError(image.url)}
+                            />
+                          ) : (
+                            <div className="w-8 h-8 bg-muted rounded flex items-center justify-center text-xs text-muted-foreground">
+                              ❌
+                            </div>
+                          )}
                           <span className="text-xs text-muted-foreground truncate">
                             {image.title || "Untitled"}
                           </span>
