@@ -28,12 +28,16 @@ export class InMemoryCache<T> {
   /**
    * Generate a normalized cache key from query parameters
    */
-  static generateKey(query: string, maxResults: number, apiKeyHash?: string): string {
+  static generateKey(query: string, maxResults: number, apiKeyHash?: string, filtersHash?: string): string {
     const normalizedQuery = query.toLowerCase().trim()
     const keyParts = [normalizedQuery, maxResults.toString()]
     
     if (apiKeyHash) {
       keyParts.push(apiKeyHash.substring(0, 8)) // Use first 8 chars of hash
+    }
+    
+    if (filtersHash) {
+      keyParts.push(filtersHash.substring(0, 8)) // Use first 8 chars of filters hash
     }
     
     return keyParts.join(':')

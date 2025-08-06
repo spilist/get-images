@@ -1,5 +1,6 @@
 import { ApiKeyConfig } from '@/types/api';
 
+import type { SearchFilters } from './serpapi.service';
 const API_KEY_STORAGE_KEY = 'serpapi_user_key';
 
 /**
@@ -42,6 +43,54 @@ export function removeStoredApiKey(): boolean {
     return true;
   } catch (error) {
     console.error('Failed to remove stored API key:', error);
+    return false;
+  }
+}
+
+// Storage key for search filters
+const SEARCH_FILTERS_STORAGE_KEY = 'serpapi_search_filters';
+
+/**
+ * Get the stored search filters from localStorage
+ */
+export function getStoredSearchFilters(): SearchFilters | null {
+  if (typeof window === 'undefined') return null;
+  
+  try {
+    const stored = localStorage.getItem(SEARCH_FILTERS_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : null;
+  } catch (error) {
+    console.error('Failed to retrieve search filters:', error);
+    return null;
+  }
+}
+
+/**
+ * Store search filters in localStorage
+ */
+export function storeSearchFilters(filters: SearchFilters): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  try {
+    localStorage.setItem(SEARCH_FILTERS_STORAGE_KEY, JSON.stringify(filters));
+    return true;
+  } catch (error) {
+    console.error('Failed to store search filters:', error);
+    return false;
+  }
+}
+
+/**
+ * Remove search filters from localStorage
+ */
+export function removeStoredSearchFilters(): boolean {
+  if (typeof window === 'undefined') return false;
+  
+  try {
+    localStorage.removeItem(SEARCH_FILTERS_STORAGE_KEY);
+    return true;
+  } catch (error) {
+    console.error('Failed to remove search filters:', error);
     return false;
   }
 }

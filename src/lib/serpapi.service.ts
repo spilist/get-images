@@ -28,6 +28,23 @@ interface SerpAPIImageResult {
   source?: string
 }
 
+// Search filter types
+export type LicenseType = 'f' | 'fc' | 'fm' | 'fmc' | 'cl' | 'ol'
+export type AspectRatio = 's' | 't' | 'w' | 'xw'
+export type ImageSize = 'i' | 'm' | 'l' | 'qsvga' | 'vga' | 'svga' | 'xga' | 'sxga' | 'uxga' | 'qxga' | 'sxga+' | 'wxga' | 'wsxga' | 'wuxga' | 'wqxga' | 'wquxga' | 'whxga' | 'whsxga' | 'whuxga' | '2mp' | '4mp' | '6mp' | '8mp' | '10mp' | '12mp' | '15mp' | '20mp' | '40mp' | '70mp'
+export type ImageType = 'face' | 'photo' | 'clipart' | 'lineart' | 'animated'
+export type SafeSearch = 'active' | 'off'
+
+export interface SearchFilters {
+  licenses?: LicenseType
+  hl?: string // Language code
+  start_date?: string // YYYYMMDD format
+  imgar?: AspectRatio
+  imgsz?: ImageSize
+  image_type?: ImageType
+  safe?: SafeSearch
+}
+
 interface SerpAPIResponse {
   error?: string
   images_results?: SerpAPIImageResult[]
@@ -109,7 +126,7 @@ function parseSerpAPIError(errorMessage: string, userApiKey?: string): string {
   }
 }
 
-async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, userApiKey?: string): Promise<SearchResult> {
+async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, userApiKey?: string, filters?: SearchFilters): Promise<SearchResult> {
   // Use user-provided API key if available, otherwise fall back to environment keys with rotation
   const apiKey = userApiKey || getEnvironmentApiKey()
   
@@ -123,9 +140,10 @@ async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, us
     }
   }
 
-  // Generate cache key
+  // Generate cache key including filters
   const apiKeyHash = apiKey ? simpleHash(apiKey) : undefined
-  const cacheKey = InMemoryCache.generateKey(query, maxResults, apiKeyHash)
+  const filtersHash = filters ? simpleHash(JSON.stringify(filters)) : undefined
+  const cacheKey = InMemoryCache.generateKey(query, maxResults, apiKeyHash, filtersHash)
   
   // Check cache first
   const cachedResult = searchCache.get(cacheKey)
@@ -136,14 +154,24 @@ async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, us
 
   try {
     const result = await new Promise<SerpAPIResponse>((resolve, reject) => {
-      getJson({
-        engine: "google",
+      const searchParams: Record<string, string | number> = {
+        engine: "google_images_light",
         api_key: apiKey,
         q: query,
         tbm: "isch", // Image search parameter
         num: maxResults,
-        safe: "active"
-      }, (json: SerpAPIResponse) => {
+        safe: filters?.safe || "active"
+      }
+
+      // Add optional filters if provided
+      if (filters?.licenses) searchParams.licenses = filters.licenses
+      if (filters?.hl) searchParams.hl = filters.hl
+      if (filters?.start_date) searchParams.start_date = filters.start_date
+      if (filters?.imgar) searchParams.imgar = filters.imgar
+      if (filters?.imgsz) searchParams.imgsz = filters.imgsz
+      if (filters?.image_type) searchParams.image_type = filters.image_type
+
+      getJson(searchParams, (json: SerpAPIResponse) => {
         if (json.error) {
           reject(new Error(json.error))
         } else {
@@ -200,7 +228,8 @@ export async function searchMultipleKeywords(
   keywords: string[], 
   maxKeywords: number = 10, 
   maxResultsPerKeyword: number = 3,
-  userApiKey?: string
+  userApiKey?: string,
+  filters?: SearchFilters
 ): Promise<MultipleKeywordsResponse> {
   const limitedKeywords = keywords.slice(0, maxKeywords)
   const results: Record<string, SearchResult> = {}
@@ -210,7 +239,7 @@ export async function searchMultipleKeywords(
 
   // Process keywords sequentially to avoid rate limiting
   for (const keyword of limitedKeywords) {
-    const result = await searchImagesWithSerpAPI(keyword, maxResultsPerKeyword, userApiKey)
+    const result = await searchImagesWithSerpAPI(keyword, maxResultsPerKeyword, userApiKey, filters)
     results[keyword] = result
     
     if (result.success) {
@@ -246,7 +275,8 @@ export async function searchMultipleKeywords(
 export async function searchSingleKeyword(
   query: string,
   maxResults: number = 3,
-  userApiKey?: string
+  userApiKey?: string,
+  filters?: SearchFilters
 ): Promise<SearchResult> {
-  return searchImagesWithSerpAPI(query, maxResults, userApiKey)
+  return searchImagesWithSerpAPI(query, maxResults, userApiKey, filters)
 }

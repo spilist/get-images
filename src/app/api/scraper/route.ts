@@ -10,7 +10,7 @@ export async function POST(request: NextRequest) {
     
     // Handle single query
     if ('query' in body) {
-      const { query, max_results = 3 } = body
+      const { query, max_results = 3, filters } = body
       
       if (!query || typeof query !== 'string') {
         return NextResponse.json({
@@ -19,7 +19,7 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
-      const result = await searchSingleKeyword(query, max_results, userApiKey)
+      const result = await searchSingleKeyword(query, max_results, userApiKey, filters)
       
       return NextResponse.json(result, {
         headers: {
@@ -35,7 +35,8 @@ export async function POST(request: NextRequest) {
       const { 
         keywords, 
         max_keywords = 10, 
-        max_results_per_keyword = 3 
+        max_results_per_keyword = 3,
+        filters
       } = body
       
       if (!Array.isArray(keywords) || keywords.length === 0) {
@@ -45,7 +46,7 @@ export async function POST(request: NextRequest) {
         }, { status: 400 })
       }
 
-      const result = await searchMultipleKeywords(keywords, max_keywords, max_results_per_keyword, userApiKey)
+      const result = await searchMultipleKeywords(keywords, max_keywords, max_results_per_keyword, userApiKey, filters)
       
       return NextResponse.json(result, {
         headers: {
