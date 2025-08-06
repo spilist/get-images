@@ -1,6 +1,8 @@
-# Image Scraper Web
+# Image Scraper - Quick Multi-Source Image Search
 
-A modern web application for searching and collecting images from multiple sources. Built with Next.js 15, TypeScript, and shadcn/ui components.
+A modern, intelligent web application that enables users to search and collect images from multiple sources with advanced features like automatic API key rotation, smart image validation, and dual search capabilities. Built with Next.js 15, TypeScript, and shadcn/ui components, featuring both web interface and CLI tools for comprehensive image discovery workflows.
+
+*[한국어 버전 보기](README.ko.md)*
 
 ## 🤖 About This Project
 
@@ -179,7 +181,15 @@ The app is a standard Next.js application and can be deployed on any platform su
 
 This project is open source and available under the [MIT License](LICENSE).
 
-## 🆘 Support
+## ☕ Support This Project
+
+If you find this project helpful, consider supporting its development:
+
+**[☕ Buy me a coffee](https://coff.ee/steady.study.dev)**
+
+Created by [배휘동](https://stdy.blog)
+
+## 🆘 Help & Documentation
 
 - **Issues**: Report bugs or request features via GitHub Issues
 - **Documentation**: Check `CLAUDE.md` for development guidelines

@@ -9,7 +9,7 @@ import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Progress } from "@/components/ui/progress";
-import { Copy, Search, AlertCircle, CheckCircle2 } from "lucide-react";
+import { Copy, Search, AlertCircle, CheckCircle2, Coffee, ExternalLink } from "lucide-react";
 import { MultipleKeywordsResponse, ImageResult, SelectedImages, SearchState } from "@/types/api";
 import { SettingsDialog } from "@/components/settings-dialog";
 import { useApiKey } from "@/hooks/use-api-key";
@@ -27,10 +27,14 @@ export default function Home() {
   const { config: apiKeyConfig, hasUserKey, updateConfig } = useApiKey();
 
   const parseKeywords = (input: string): string[] => {
-    return input
+    const keywords = input
+      .trim() // Remove leading/trailing whitespace from entire input
       .split("\n")
-      .map(keyword => keyword.trim())
-      .filter(keyword => keyword.length > 0);
+      .map(keyword => keyword.trim()) // Remove leading/trailing whitespace from each keyword
+      .filter(keyword => keyword.length > 0); // Remove empty keywords
+    
+    // Remove duplicates while preserving order (case-sensitive)
+    return [...new Set(keywords)];
   };
 
   // Sample data generator based on sample-result.txt
@@ -381,8 +385,22 @@ export default function Home() {
             <div className="flex justify-between items-start">
               <div></div> {/* Empty div for spacing */}
               <div className="flex-1">
-                <h1 className="text-3xl font-bold mb-2">Image Search & Preview</h1>
-                <p className="text-muted-foreground">Search for images using multiple keywords and create your curated list</p>
+                <h1 className="text-3xl font-bold mb-2">Image Scraper</h1>
+                <p className="text-muted-foreground mb-3">Search for images using multiple keywords and create your curated list</p>
+                <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
+                  <span>Created by <a href="https://stdy.blog" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">배휘동</a></span>
+                  <span>•</span>
+                  <a 
+                    href="https://coff.ee/steady.study.dev" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-1 text-primary hover:underline transition-colors"
+                  >
+                    <Coffee className="h-4 w-4" />
+                    Buy me a coffee
+                    <ExternalLink className="h-3 w-3" />
+                  </a>
+                </div>
               </div>
               <div className="flex items-start gap-2">
                 <SettingsDialog onApiKeyChange={updateConfig} />
@@ -401,6 +419,21 @@ export default function Home() {
                     <Badge variant="outline" className="text-xs">
                       {parseKeywords(keywordsInput).length}/10
                     </Badge>
+                    {(() => {
+                      const rawKeywords = keywordsInput
+                        .trim()
+                        .split("\n")
+                        .map(keyword => keyword.trim())
+                        .filter(keyword => keyword.length > 0);
+                      const uniqueKeywords = parseKeywords(keywordsInput);
+                      const duplicateCount = rawKeywords.length - uniqueKeywords.length;
+                      
+                      return duplicateCount > 0 ? (
+                        <Badge variant="secondary" className="text-xs">
+                          -{duplicateCount} duplicate{duplicateCount > 1 ? 's' : ''}
+                        </Badge>
+                      ) : null;
+                    })()}
                     <Badge 
                       variant={hasUserKey ? "default" : "secondary"} 
                       className="text-xs"
