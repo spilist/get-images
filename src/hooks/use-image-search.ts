@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { MultipleKeywordsResponse } from "@/types/api";
+import { SearchFilters } from "@/lib/serpapi.service";
 
 interface UseImageSearchState {
   isLoading: boolean;
@@ -8,9 +9,10 @@ interface UseImageSearchState {
 }
 
 interface UseImageSearchReturn extends UseImageSearchState {
-  search: (keywords: string[], apiKey?: string) => Promise<void>;
+  search: (keywords: string[], apiKey?: string, searchFilters?: SearchFilters) => Promise<void>;
   runSampleSearch: () => Promise<void>;
   clearResults: () => void;
+  currentSearchFilters: SearchFilters | null;
 }
 
 export function useImageSearch(): UseImageSearchReturn {
@@ -19,6 +21,7 @@ export function useImageSearch(): UseImageSearchReturn {
     error: null,
     results: null
   });
+  const [currentSearchFilters, setCurrentSearchFilters] = useState<SearchFilters | null>(null);
 
 
   const generateSampleData = (): MultipleKeywordsResponse => {
@@ -82,7 +85,7 @@ export function useImageSearch(): UseImageSearchReturn {
     };
   };
 
-  const search = useCallback(async (keywords: string[], apiKey?: string) => {
+  const search = useCallback(async (keywords: string[], apiKey?: string, searchFilters?: SearchFilters) => {
     if (keywords.length === 0) {
       setState(prev => ({ ...prev, error: "Please enter at least one keyword" }));
       return;
@@ -94,6 +97,7 @@ export function useImageSearch(): UseImageSearchReturn {
     }
 
     setState(prev => ({ ...prev, isLoading: true, error: null }));
+    setCurrentSearchFilters(searchFilters || null);
 
     try {
       const requestBody: {
@@ -145,6 +149,7 @@ export function useImageSearch(): UseImageSearchReturn {
 
   const runSampleSearch = useCallback(async () => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
+    setCurrentSearchFilters(null);
 
     // Simulate API delay
     await new Promise(resolve => setTimeout(resolve, 1000));
@@ -172,12 +177,14 @@ export function useImageSearch(): UseImageSearchReturn {
       error: null,
       results: null
     });
+    setCurrentSearchFilters(null);
   }, []);
 
   return {
     ...state,
     search,
     runSampleSearch,
-    clearResults
+    clearResults,
+    currentSearchFilters
   };
 }

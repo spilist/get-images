@@ -7,15 +7,33 @@ import { Coffee, ExternalLink, Github, AlertTriangle, Settings, X } from "lucide
 import { SettingsDialog } from "@/components/settings-dialog";
 import { SearchPanel } from "@/components/search-panel";
 import { ImageResultsDisplay } from "@/components/image-results-display";
+import { SearchHistoryTrigger } from "@/components/search-history-trigger";
 import { useApiKey } from "@/hooks/use-api-key";
 import { useImageSearch } from "@/hooks/use-image-search";
 import { useImageSelection } from "@/hooks/use-image-selection";
+import { useSearchHistory } from "@/hooks/use-search-history";
 import { useDemoNotice } from "@/hooks/use-demo-notice";
+import { getStoredSearchFilters } from "@/lib/api-key-storage";
 
 export default function Home() {
   const { config: apiKeyConfig, updateConfig } = useApiKey();
-  const { isLoading, error, results, search, runSampleSearch } = useImageSearch();
-  const { selectedImages, failedImages, selectImage, handleImageError } = useImageSelection(results);
+  const { isLoading, error, results, search, runSampleSearch, currentSearchFilters } = useImageSearch();
+  
+  // Search history integration
+  const handleRerunSearch = async (keywords: string[], searchFilters?: import('@/lib/serpapi.service').SearchFilters) => {
+    const apiKey = apiKeyConfig?.source === 'user' && apiKeyConfig.isValid && apiKeyConfig.apiKey 
+      ? apiKeyConfig.apiKey 
+      : undefined;
+    await search(keywords, apiKey, searchFilters);
+  };
+  
+  const { history, addToHistory, removeFromHistory, clearHistory, rerunSearch } = useSearchHistory(handleRerunSearch);
+  
+  const { selectedImages, failedImages, selectImage, handleImageError } = useImageSelection(
+    results, 
+    addToHistory, 
+    currentSearchFilters || undefined
+  );
   const { isVisible: isDemoNoticeVisible, closeDemoNotice } = useDemoNotice();
 
   const handleSearch = async (keywords: string[]) => {
@@ -23,7 +41,8 @@ export default function Home() {
       ? apiKeyConfig.apiKey 
       : undefined;
     
-    await search(keywords, apiKey);
+    const searchFilters = getStoredSearchFilters();
+    await search(keywords, apiKey, searchFilters || undefined);
   };
 
   const copyResults = async () => {
@@ -166,6 +185,14 @@ export default function Home() {
                 onCopy={copyResults}
                 apiKeyConfig={apiKeyConfig}
                 error={error}
+                searchHistoryTrigger={
+                  <SearchHistoryTrigger
+                    history={history}
+                    onRerunSearch={rerunSearch}
+                    onRemoveEntry={removeFromHistory}
+                    onClearHistory={clearHistory}
+                  />
+                }
               />
             </CardContent>
           </Card>

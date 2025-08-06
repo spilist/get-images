@@ -22,6 +22,7 @@ interface SearchPanelProps {
   onCopy: () => Promise<void>;
   apiKeyConfig: ApiKeyConfig | null;
   error: string | null;
+  searchHistoryTrigger?: React.ReactNode;
 }
 
 export function SearchPanel({
@@ -31,7 +32,8 @@ export function SearchPanel({
   selectedImageCount,
   onCopy,
   apiKeyConfig,
-  error
+  error,
+  searchHistoryTrigger
 }: SearchPanelProps) {
   const [keywordsInput, setKeywordsInput] = useState("");
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
@@ -73,9 +75,16 @@ export function SearchPanel({
     <div className="space-y-4">
       {/* Keywords input */}
       <div className="space-y-2">
-        <div className="flex items-center gap-2 flex-wrap">
-          <Search className="h-4 w-4" />
-          <span className="text-sm font-medium">Keywords (max 10)</span>
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2 flex-wrap">
+            <Search className="h-4 w-4" />
+            <span className="text-sm font-medium">Keywords (max 10)</span>
+          </div>
+          {searchHistoryTrigger && (
+            <div className="flex-shrink-0">
+              {searchHistoryTrigger}
+            </div>
+          )}
         </div>
         <p className="text-xs text-muted-foreground">
           Enter each keyword on a new line to search for multiple images
@@ -149,7 +158,7 @@ export function SearchPanel({
             ) : (
               <Copy className="h-4 w-4" />
             )}
-            {copyStatus === "success" ? "Copied!" : "Copy All"}
+            {copyStatus === "success" ? "Copied!" : "Copy Results"}
           </Button>
         )}
       </div>

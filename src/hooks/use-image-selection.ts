@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { ImageResult, SelectedImages, MultipleKeywordsResponse } from "@/types/api";
+import { SearchFilters } from "@/lib/serpapi.service";
 
 interface UseImageSelectionReturn {
   selectedImages: SelectedImages;
@@ -9,7 +10,11 @@ interface UseImageSelectionReturn {
   clearSelection: () => void;
 }
 
-export function useImageSelection(results: MultipleKeywordsResponse | null): UseImageSelectionReturn {
+export function useImageSelection(
+  results: MultipleKeywordsResponse | null,
+  onAddToHistory?: (keywords: string[], selectedImages: { [keyword: string]: { url: string; title: string; } }, searchFilters?: SearchFilters) => void,
+  searchFilters?: SearchFilters
+): UseImageSelectionReturn {
   const [selectedImages, setSelectedImages] = useState<SelectedImages>({});
   const [failedImages, setFailedImages] = useState<Set<string>>(new Set());
 
@@ -29,15 +34,46 @@ export function useImageSelection(results: MultipleKeywordsResponse | null): Use
       
       setSelectedImages(defaultSelections);
       setFailedImages(new Set()); // Clear failed images for new search
+      
+      // Save to history when search completes and images are auto-selected
+      if (Object.keys(defaultSelections).length > 0 && onAddToHistory) {
+        const keywords = Object.keys(results.results);
+        const selectedImageData: { [keyword: string]: { url: string; title: string; } } = {};
+        
+        Object.entries(defaultSelections).forEach(([keyword, image]) => {
+          selectedImageData[keyword] = {
+            url: image.url,
+            title: image.title
+          };
+        });
+        
+        onAddToHistory(keywords, selectedImageData, searchFilters);
+      }
     }
-  }, [results]);
+  }, [results, onAddToHistory, searchFilters]);
 
   const selectImage = useCallback((keyword: string, image: ImageResult) => {
     setSelectedImages(prev => ({
       ...prev,
       [keyword]: image
     }));
-  }, []);
+    
+    // Update history with the new selection
+    if (onAddToHistory && results?.results) {
+      const keywords = Object.keys(results.results);
+      const updatedSelections = { ...selectedImages, [keyword]: image };
+      const selectedImageData: { [keyword: string]: { url: string; title: string; } } = {};
+      
+      Object.entries(updatedSelections).forEach(([kw, img]) => {
+        selectedImageData[kw] = {
+          url: img.url,
+          title: img.title
+        };
+      });
+      
+      onAddToHistory(keywords, selectedImageData, searchFilters);
+    }
+  }, [onAddToHistory, searchFilters, results, selectedImages]);
 
   const findNextAvailableImage = useCallback((keyword: string, failedUrl: string) => {
     if (!results?.results) return;
