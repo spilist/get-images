@@ -28,7 +28,9 @@
       "WebFetch(domain:www.npmjs.com)",
       "mcp__shadcn__get_component",
       "Bash(npm install:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "mcp__serena__replace_symbol_body",
+      "mcp__serena__insert_after_symbol"
     ],
     "deny": []
   }

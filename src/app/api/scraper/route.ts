@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getJson } from 'serpapi'
+import { InMemoryCache, simpleHash } from '@/lib/cache'
 
 interface ImageResult {
   url: string
@@ -35,6 +36,13 @@ interface SerpAPIResponse {
 // Simple counter for API key rotation
 let apiKeyRotationCounter = 0;
 
+// Initialize cache for search results
+const searchCache = new InMemoryCache<SearchResult>({
+  defaultTTL: 24 * 60 * 60 * 1000, // 24 hours
+  maxSize: 1000,
+  cleanupInterval: 60 * 60 * 1000 // 1 hour cleanup interval
+});
+
 function getEnvironmentApiKey(): string | undefined {
   const key1 = process.env.SERPAPI_KEY;
   const key2 = process.env.SERPAPI_KEY2;
@@ -61,6 +69,17 @@ async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, us
       images: [],
       error: 'No API key available. Please configure your SERPAPI key in settings or contact administrator.'
     }
+  }
+
+  // Generate cache key
+  const apiKeyHash = apiKey ? simpleHash(apiKey) : undefined
+  const cacheKey = InMemoryCache.generateKey(query, maxResults, apiKeyHash)
+  
+  // Check cache first
+  const cachedResult = searchCache.get(cacheKey)
+  if (cachedResult) {
+    console.log(`Cache hit for query: "${query}"`)
+    return cachedResult
   }
 
   try {
@@ -95,12 +114,18 @@ async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, us
       }
     }
 
-    return {
+    const searchResult: SearchResult = {
       success: true,
       query,
       count: images.length,
       images
     }
+
+    // Cache successful result
+    searchCache.set(cacheKey, searchResult)
+    console.log(`Cached result for query: "${query}" with ${images.length} images`)
+
+    return searchResult
   } catch (error) {
     console.error('SerpAPI search error:', error)
     return {

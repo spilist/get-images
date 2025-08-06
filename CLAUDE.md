@@ -50,6 +50,7 @@ The project uses different image search APIs for different contexts:
 ### Key Features
 - **API Key Flexibility**: Users can provide their own SERPAPI key or use the environment default
 - **API Key Rotation**: Automatic rotation between multiple environment keys for load balancing
+- **In-Memory Caching**: 24-hour cache for search results to reduce API calls and improve performance
 - **Immediate Usability**: Works out-of-the-box with environment SERPAPI_KEY
 - **Dual Usage**: Web interface for interactive use, CLI for batch processing
 - **Error Handling**: Graceful fallbacks and user feedback
@@ -86,6 +87,40 @@ This approach allows:
 - Immediate functionality for new users
 - Personal API key usage for heavy users
 - Easy deployment and self-hosting
+
+## Caching System
+
+The application implements an in-memory caching system to reduce redundant API calls and improve performance:
+
+### Cache Implementation
+- **Location**: `src/lib/cache.ts` - Generic in-memory cache utility
+- **Integration**: Applied in `searchImagesWithSerpAPI` function in API route
+- **Type**: In-memory Map with TTL (Time To Live) support
+
+### Cache Configuration
+- **Default TTL**: 24 hours (86400000ms) for search results
+- **Max Entries**: 1000 cached search results
+- **Cleanup**: Automatic cleanup every 1 hour to remove expired entries
+- **Key Strategy**: `${normalized_query}:${max_results}:${api_key_hash}`
+
+### Cache Features
+- **Automatic Expiration**: Entries automatically expire after 24 hours
+- **Memory Management**: LRU-style eviction when max size is reached
+- **API Key Awareness**: Different cache entries for different API keys
+- **Query Normalization**: Case-insensitive and trimmed query matching
+- **Graceful Fallback**: Cache failures don't break API functionality
+
+### Cache Benefits
+- **Cost Reduction**: Eliminates duplicate SERPAPI calls for repeated searches
+- **Performance**: Cached results return in <10ms vs API call latency
+- **User Experience**: Instant results for previously searched queries
+- **Rate Limit Protection**: Reduces API usage against rate limits
+
+### Technical Details
+- Cache keys include query, max_results, and API key hash for proper isolation
+- Successful search results only are cached (errors are not cached)
+- Console logging for cache hits/misses and cleanup operations
+- Thread-safe operations with automatic cleanup timers
 
 ## Deployment
 

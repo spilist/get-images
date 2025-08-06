@@ -112,57 +112,19 @@ export default function Home() {
     try {
       const data = generateSampleData();
       
-      // Auto-select first available image for each keyword
+      // Auto-select first available image for each keyword (simplified approach)
       const defaultSelections: SelectedImages = {};
-      const newFailedImages = new Set<string>();
       
-      // Test image availability and auto-select first working image
-      const testImagePromises = Object.entries(data.results).map(async ([keyword, result]) => {
+      // Simply select the first image for each keyword - let error handling deal with failures
+      Object.entries(data.results).forEach(([keyword, result]) => {
         if (result.success && result.images.length > 0) {
-          // Test each image until we find one that loads
-          for (const image of result.images) {
-            try {
-              await new Promise<void>((resolve, reject) => {
-                const img = document.createElement('img');
-                const timeoutId = setTimeout(() => {
-                  img.src = ''; // Stop loading
-                  reject(new Error('Timeout'));
-                }, 3000);
-                
-                img.onload = () => {
-                  clearTimeout(timeoutId);
-                  resolve();
-                };
-                img.onerror = () => {
-                  clearTimeout(timeoutId);
-                  reject(new Error('Load failed'));
-                };
-                img.src = image.url;
-              });
-              
-              // If we get here, the image loaded successfully
-              defaultSelections[keyword] = image;
-              console.log(`✅ Auto-selected working image for "${keyword}": ${image.url}`);
-              break;
-            } catch {
-              // Image failed to load, try next one
-              newFailedImages.add(image.url);
-              console.log(`❌ Image failed for "${keyword}": ${image.url}`);
-            }
-          }
-          
-          // If no image worked, log it
-          if (!defaultSelections[keyword]) {
-            console.log(`⚠️ No working images found for "${keyword}"`);
-          }
+          // Always select the first image initially
+          defaultSelections[keyword] = result.images[0];
+          console.log(`✅ Auto-selected first image for "${keyword}": ${result.images[0].url}`);
         }
       });
       
-      // Wait for all image tests to complete
-      await Promise.allSettled(testImagePromises);
-      
-      // Update failed images state once with all results
-      setFailedImages(newFailedImages);
+      console.log(`📋 Auto-selected ${Object.keys(defaultSelections).length} images out of ${Object.keys(data.results).length} keywords`);
 
       setSearchState({
         isLoading: false,
@@ -229,57 +191,19 @@ export default function Home() {
         throw new Error("Search failed");
       }
 
-      // Auto-select first available image for each keyword
+      // Auto-select first available image for each keyword (simplified approach)
       const defaultSelections: SelectedImages = {};
-      const newFailedImages = new Set<string>();
       
-      // Test image availability and auto-select first working image
-      const testImagePromises = Object.entries(data.results).map(async ([keyword, result]) => {
+      // Simply select the first image for each keyword - let error handling deal with failures
+      Object.entries(data.results).forEach(([keyword, result]) => {
         if (result.success && result.images.length > 0) {
-          // Test each image until we find one that loads
-          for (const image of result.images) {
-            try {
-              await new Promise<void>((resolve, reject) => {
-                const img = document.createElement('img');
-                const timeoutId = setTimeout(() => {
-                  img.src = ''; // Stop loading
-                  reject(new Error('Timeout'));
-                }, 3000);
-                
-                img.onload = () => {
-                  clearTimeout(timeoutId);
-                  resolve();
-                };
-                img.onerror = () => {
-                  clearTimeout(timeoutId);
-                  reject(new Error('Load failed'));
-                };
-                img.src = image.url;
-              });
-              
-              // If we get here, the image loaded successfully
-              defaultSelections[keyword] = image;
-              console.log(`✅ Auto-selected working image for "${keyword}": ${image.url}`);
-              break;
-            } catch {
-              // Image failed to load, try next one
-              newFailedImages.add(image.url);
-              console.log(`❌ Image failed for "${keyword}": ${image.url}`);
-            }
-          }
-          
-          // If no image worked, log it
-          if (!defaultSelections[keyword]) {
-            console.log(`⚠️ No working images found for "${keyword}"`);
-          }
+          // Always select the first image initially
+          defaultSelections[keyword] = result.images[0];
+          console.log(`✅ Auto-selected first image for "${keyword}": ${result.images[0].url}`);
         }
       });
       
-      // Wait for all image tests to complete
-      await Promise.allSettled(testImagePromises);
-      
-      // Update failed images state once with all results
-      setFailedImages(newFailedImages);
+      console.log(`📋 Auto-selected ${Object.keys(defaultSelections).length} images out of ${Object.keys(data.results).length} keywords`);
 
       setSearchState({
         isLoading: false,
@@ -297,8 +221,6 @@ export default function Home() {
   };
 
   const handleImageError = (imageUrl: string) => {
-    setFailedImages(prev => new Set([...prev, imageUrl]));
-    
     // Check if this failed image was currently selected, and find replacement
     const currentSelections = searchState.selectedImages;
     const affectedKeyword = Object.entries(currentSelections).find(
@@ -307,10 +229,13 @@ export default function Home() {
     
     if (affectedKeyword) {
       console.log(`🔄 Selected image failed for "${affectedKeyword}", finding replacement...`);
-      // Use a small delay to ensure state is updated
-      setTimeout(() => findNextAvailableImage(affectedKeyword), 100);
+      // Find replacement immediately with the failed URL
+      findNextAvailableImageWithFailedUrl(affectedKeyword, imageUrl);
     }
-  };
+    
+    // Update failed images state
+    setFailedImages(prev => new Set([...prev, imageUrl]));
+  };;
 
   const selectImage = (keyword: string, image: ImageResult) => {
     setSearchState(prev => ({
@@ -327,40 +252,40 @@ export default function Home() {
     const result = searchState.results?.results[keyword];
     if (!result?.success || !result.images.length) return;
 
+    // Find the next available image that hasn't failed yet
     const availableImages = result.images.filter(img => !failedImages.has(img.url));
     
-    for (const image of availableImages) {
-      try {
-        await new Promise<void>((resolve, reject) => {
-          const img = document.createElement('img');
-          const timeoutId = setTimeout(() => {
-            img.src = '';
-            reject(new Error('Timeout'));
-          }, 2000); // Shorter timeout for fallback
-          
-          img.onload = () => {
-            clearTimeout(timeoutId);
-            resolve();
-          };
-          img.onerror = () => {
-            clearTimeout(timeoutId);
-            reject(new Error('Load failed'));
-          };
-          img.src = image.url;
-        });
-        
-        // Found a working image, select it
-        console.log(`🔄 Auto-fallback: Selected working image for "${keyword}": ${image.url}`);
-        selectImage(keyword, image);
-        return;
-      } catch {
-        // This image also failed, mark it and try next
-        setFailedImages(prev => new Set([...prev, image.url]));
-      }
+    if (availableImages.length > 0) {
+      // Simply select the next available image without complex testing
+      const nextImage = availableImages[0];
+      console.log(`🔄 Auto-fallback: Selecting next available image for "${keyword}": ${nextImage.url}`);
+      selectImage(keyword, nextImage);
+    } else {
+      console.log(`⚠️ No more fallback images available for "${keyword}"`);
     }
+  };;
+  // New function that takes failed URL as parameter to avoid stale state issues
+  const findNextAvailableImageWithFailedUrl = (keyword: string, failedUrl: string) => {
+    const result = searchState.results?.results[keyword];
+    if (!result?.success || !result.images.length) return;
+
+    // Create a new failed set that includes the current failed URL
+    const currentFailedUrls = new Set([...failedImages, failedUrl]);
     
-    console.log(`⚠️ No fallback images available for "${keyword}"`);
+    // Find the next available image that hasn't failed
+    const availableImages = result.images.filter(img => !currentFailedUrls.has(img.url));
+    
+    if (availableImages.length > 0) {
+      const nextImage = availableImages[0];
+      console.log(`🔄 Immediate fallback: Selecting next available image for "${keyword}": ${nextImage.url}`);
+      selectImage(keyword, nextImage);
+    } else {
+      console.log(`⚠️ No more fallback images available for "${keyword}"`);
+    }
   };
+
+
+;;
 
   const copyResults = async () => {
     const results = Object.entries(searchState.selectedImages)
