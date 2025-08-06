@@ -76,6 +76,11 @@ export function SearchPanel({
         <div className="flex items-center gap-2 flex-wrap">
           <Search className="h-4 w-4" />
           <span className="text-sm font-medium">Keywords (max 10)</span>
+        </div>
+        <p className="text-xs text-muted-foreground">
+          Enter each keyword on a new line to search for multiple images
+        </p>
+        <div className="flex items-center gap-2 flex-wrap">
           <Badge variant="outline" className="text-xs">
             {parseKeywords(keywordsInput).length}/10
           </Badge>
@@ -103,7 +108,10 @@ export function SearchPanel({
           </Badge>
         </div>
         <Textarea
-          placeholder="삼계탕&#10;추어탕&#10;김치찌개&#10;된장찌개"
+          placeholder={`삼계탕
+추어탕
+김치찌개
+된장찌개`}
           value={keywordsInput}
           onChange={(e) => setKeywordsInput(e.target.value)}
           className="min-h-16 sm:min-h-20 resize-none text-sm"

@@ -22,6 +22,7 @@ export interface MultipleKeywordsResponse {
   success: boolean;
   total_keywords: number;
   results: Record<string, SingleQueryResult>;
+  error?: string;
 }
 
 export interface SelectedImages {

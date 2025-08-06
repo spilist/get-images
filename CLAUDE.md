@@ -131,3 +131,8 @@ Configured for Vercel deployment with:
 - Automatic Next.js detection and deployment
 - Environment variable support for SERPAPI_KEY
 - Static file serving for CLI scripts and requirements
+
+## UI/UX Guidelines
+
+### Styling Considerations
+- Make sure all buttons should have cursor:pointer.

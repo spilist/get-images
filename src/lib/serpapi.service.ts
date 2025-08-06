@@ -19,6 +19,7 @@ interface MultipleKeywordsResponse {
   success: boolean
   total_keywords: number
   results: Record<string, SearchResult>
+  error?: string
 }
 
 interface SerpAPIImageResult {
@@ -54,6 +55,58 @@ function getEnvironmentApiKey(): string | undefined {
   
   // Otherwise, return whichever key is available
   return key1 || key2;
+}
+
+function parseSerpAPIError(errorMessage: string, userApiKey?: string): string {
+  const lowerError = errorMessage.toLowerCase()
+  
+  // Check for specific SERPAPI error patterns
+  if (lowerError.includes('invalid api key') || lowerError.includes('unauthorized')) {
+    if (userApiKey) {
+      return 'Invalid API key provided. Please check your API key in Settings and ensure it\'s correct. You can get a valid API key from https://serpapi.com/manage-api-key'
+    } else {
+      return 'Demo API key is invalid or expired. Please open Settings and provide your own SERPAPI key from https://serpapi.com/manage-api-key'
+    }
+  }
+  
+  if (lowerError.includes('run out of searches') || lowerError.includes('account has run out')) {
+    if (userApiKey) {
+      return 'Your API key has run out of searches. Please check your SERPAPI account or upgrade your plan at https://serpapi.com/manage-api-key'
+    } else {
+      return 'Demo account has run out of searches. Please open Settings and provide your own SERPAPI key to continue using the service.'
+    }
+  }
+  
+  if (lowerError.includes('too many requests') || lowerError.includes('rate limit') || lowerError.includes('exceeded hourly limit')) {
+    if (userApiKey) {
+      return 'Rate limit exceeded for your API key. Please wait a moment and try again, or consider upgrading your SERPAPI plan.'
+    } else {
+      return 'Demo service rate limit exceeded. Please open Settings and provide your own SERPAPI key for unlimited access.'
+    }
+  }
+  
+  if (lowerError.includes('missing') && lowerError.includes('parameter')) {
+    return 'Search request is missing required parameters. Please try again with a valid search query.'
+  }
+  
+  if (lowerError.includes('forbidden')) {
+    return 'Access forbidden. Your API key may not have permission for this type of search. Please check your SERPAPI account settings.'
+  }
+  
+  if (lowerError.includes('not found') || lowerError.includes('404')) {
+    return 'Search resource not found. Please try a different search query.'
+  }
+  
+  if (lowerError.includes('server error') || lowerError.includes('503') || lowerError.includes('500')) {
+    return 'SERPAPI server is temporarily unavailable. Please try again in a few moments.'
+  }
+  
+  // Default fallback error message
+  if (userApiKey) {
+    return `Search failed: ${errorMessage}. Please try again or check your API key in Settings.`
+  } else {
+    return `Demo search failed: ${errorMessage}. For reliable access, please provide your own SERPAPI key in Settings.`
+  }
 }
 
 async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, userApiKey?: string): Promise<SearchResult> {
@@ -127,12 +180,18 @@ async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, us
     return searchResult
   } catch (error) {
     console.error('SerpAPI search error:', error)
+    
+    const errorMessage = error instanceof Error ? error.message : 'Search failed'
+    
+    // Parse SERPAPI specific error messages and provide user-friendly responses
+    const userFriendlyError = parseSerpAPIError(errorMessage, userApiKey)
+    
     return {
       success: false,
       query,
       count: 0,
       images: [],
-      error: error instanceof Error ? error.message : 'Search failed'
+      error: userFriendlyError
     }
   }
 }
@@ -145,14 +204,35 @@ export async function searchMultipleKeywords(
 ): Promise<MultipleKeywordsResponse> {
   const limitedKeywords = keywords.slice(0, maxKeywords)
   const results: Record<string, SearchResult> = {}
+  
+  let hasAnySuccess = false
+  let firstError: string | undefined
 
   // Process keywords sequentially to avoid rate limiting
   for (const keyword of limitedKeywords) {
-    results[keyword] = await searchImagesWithSerpAPI(keyword, maxResultsPerKeyword, userApiKey)
+    const result = await searchImagesWithSerpAPI(keyword, maxResultsPerKeyword, userApiKey)
+    results[keyword] = result
+    
+    if (result.success) {
+      hasAnySuccess = true
+    } else if (!firstError) {
+      // Capture the first error for the overall response
+      firstError = result.error
+    }
     
     // Add small delay between requests to be respectful to the API
     if (limitedKeywords.indexOf(keyword) < limitedKeywords.length - 1) {
       await new Promise(resolve => setTimeout(resolve, 200))
+    }
+  }
+
+  // If no searches succeeded, return the error response
+  if (!hasAnySuccess && firstError) {
+    return {
+      success: false,
+      total_keywords: limitedKeywords.length,
+      results,
+      error: firstError
     }
   }
 

@@ -124,7 +124,9 @@ export function useImageSearch(): UseImageSearchReturn {
       const data: MultipleKeywordsResponse = await response.json();
       
       if (!data.success) {
-        throw new Error("Search failed");
+        // Extract error message from API response if available
+        const errorMessage = 'error' in data ? data.error : "Search failed";
+        throw new Error(errorMessage || "Search failed");
       }
 
       setState({
