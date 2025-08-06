@@ -11,7 +11,17 @@
       "mcp__serena__search_for_pattern",
       "mcp__serena__onboarding",
       "mcp__serena__find_symbol",
-      "mcp__serena__write_memory"
+      "mcp__serena__write_memory",
+      "WebFetch(domain:docs.anthropic.com)",
+      "Bash(echo $SHELL)",
+      "mcp__serena__read_memory",
+      "mcp__shadcn__list_components",
+      "mcp__shadcn__get_component_demo",
+      "Bash(pnpm:*)",
+      "Bash(curl:*)",
+      "Bash(npm run lint)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": []
   }
