@@ -22,7 +22,9 @@
       "Bash(npm run lint)",
       "Bash(npx tsc:*)",
       "Bash(npm run build:*)",
-      "mcp__serena__replace_regex"
+      "mcp__serena__replace_regex",
+      "mcp__serena__list_memories",
+      "WebFetch(domain:pypi.org)"
     ],
     "deny": []
   }
