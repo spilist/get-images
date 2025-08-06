@@ -304,41 +304,45 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="p-4">
+      <div className="p-2 sm:p-4">
         <div className="max-w-7xl mx-auto">
-          <div className="mb-6 text-center">
-            <div className="flex justify-between items-start">
-              <div></div> {/* Empty div for spacing */}
-              <div className="flex-1">
-                <h1 className="text-3xl font-bold mb-2">Image Scraper</h1>
-                <p className="text-muted-foreground mb-3">Search for images using multiple keywords and create your curated list</p>
-                <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
-                  <span>Created by <a href="https://stdy.blog" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">배휘동</a></span>
-                  <span>•</span>
-                  <a 
-                    href="https://coff.ee/steady.study.dev" 
-                    target="_blank" 
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-1 text-primary hover:underline transition-colors"
-                  >
-                    <Coffee className="h-4 w-4" />
-                    Buy me a coffee
-                    <ExternalLink className="h-3 w-3" />
-                  </a>
-                </div>
+          <div className="mb-4 sm:mb-6">
+            <div className="flex justify-between items-start mb-3 sm:mb-4">
+              <div className="flex-1 text-center sm:text-left">
+                <h1 className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">Image Scraper</h1>
+                <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block mb-3">
+                  Search for images using multiple keywords and create your curated list
+                </p>
               </div>
               <div className="flex items-start gap-2">
                 <SettingsDialog onApiKeyChange={updateConfig} />
               </div>
             </div>
+            {/* Mobile-friendly creator info */}
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground">
+              <span className="text-center">
+                Created by <a href="https://stdy.blog" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">배휘동</a>
+              </span>
+              <a 
+                href="https://coff.ee/steady.study.dev" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-primary hover:underline transition-colors"
+              >
+                <Coffee className="h-3 w-3 sm:h-4 sm:w-4" />
+                Buy me a coffee
+                <ExternalLink className="h-2 w-2 sm:h-3 sm:w-3" />
+              </a>
+            </div>
           </div>
           
           {/* Search Section */}
-          <Card className="mb-6">
-            <CardContent className="pt-6">
-              <div className="flex gap-4 items-start">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
+          <Card className="mb-4 sm:mb-6">
+            <CardContent className="pt-4 sm:pt-6">
+              <div className="space-y-4">
+                {/* Keywords input */}
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <Search className="h-4 w-4" />
                     <span className="text-sm font-medium">Keywords (max 10)</span>
                     <Badge variant="outline" className="text-xs">
@@ -364,21 +368,24 @@ export default function Home() {
                       className="text-xs"
                       title={hasUserKey ? "Using your personal SERPAPI key" : "Using environment SERPAPI key"}
                     >
-                      {hasUserKey ? "Personal Key" : "Env Key"}
+                      {hasUserKey ? "Personal" : "Env Key"}
                     </Badge>
                   </div>
                   <Textarea
                     placeholder="삼계탕&#10;추어탕&#10;김치찌개&#10;된장찌개"
                     value={keywordsInput}
                     onChange={(e) => setKeywordsInput(e.target.value)}
-                    className="min-h-20 resize-none"
+                    className="min-h-16 sm:min-h-20 resize-none text-sm"
                   />
                 </div>
-                <div className="flex flex-col gap-2 pt-6">
+                
+                {/* Buttons - horizontal on mobile, vertical on larger screens */}
+                <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                   <Button 
                     onClick={handleSearch} 
                     disabled={searchState.isLoading}
-                    className="w-32"
+                    className="flex-1 sm:flex-none sm:w-32"
+                    size="sm"
                   >
                     {searchState.isLoading ? "Searching..." : "Search Images"}
                   </Button>
@@ -386,7 +393,8 @@ export default function Home() {
                     onClick={handleSampleDemo} 
                     disabled={searchState.isLoading}
                     variant="outline"
-                    className="w-32"
+                    className="flex-1 sm:flex-none sm:w-32"
+                    size="sm"
                   >
                     {searchState.isLoading ? "Loading..." : "예시 보기"}
                   </Button>
@@ -395,7 +403,7 @@ export default function Home() {
                       size="sm"
                       variant={copyStatus === "success" ? "default" : "outline"}
                       onClick={copyResults}
-                      className="flex items-center gap-2 w-32"
+                      className="flex items-center justify-center gap-2 flex-1 sm:flex-none sm:w-32"
                     >
                       {copyStatus === "success" ? (
                         <CheckCircle2 className="h-4 w-4" />
@@ -429,20 +437,20 @@ export default function Home() {
       </div>
       
       {/* Image Preview Section - Full Width */}
-      <div className="flex-1 p-4 overflow-hidden"> 
+      <div className="flex-1 p-2 sm:p-4 overflow-hidden"> 
         <div className="max-w-7xl mx-auto h-full">
-          <div className="mb-4">
-            <h2 className="text-xl font-semibold mb-1">Image Preview</h2>
-            <p className="text-sm text-muted-foreground">Click to select images (first available one selected automatically)</p>
+          <div className="mb-3 sm:mb-4">
+            <h2 className="text-lg sm:text-xl font-semibold mb-1">Image Preview</h2>
+            <p className="text-xs sm:text-sm text-muted-foreground">Click to select images (first available one selected automatically)</p>
           </div>
           <div className="h-full overflow-y-auto">
             {searchState.isLoading ? (
-              <div className="space-y-6">
+              <div className="space-y-4 sm:space-y-6">
                 {Array.from({ length: 3 }).map((_, i) => (
-                  <div key={i} className="space-y-3">
-                    <Skeleton className="h-6 w-20" />
-                    <div className="grid grid-cols-5 gap-3">
-                      {Array.from({ length: 5 }).map((_, j) => (
+                  <div key={i} className="space-y-2 sm:space-y-3">
+                    <Skeleton className="h-5 sm:h-6 w-16 sm:w-20" />
+                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
+                      {Array.from({ length: 4 }).map((_, j) => (
                         <Skeleton key={j} className="aspect-square rounded-lg" />
                       ))}
                     </div>
@@ -450,11 +458,11 @@ export default function Home() {
                 ))}
               </div>
             ) : searchState.results ? (
-              <div className="space-y-8">
+              <div className="space-y-6 sm:space-y-8">
                 {Object.entries(searchState.results.results).map(([keyword, result]) => (
                   <div key={keyword}>
-                    <div className="flex items-center gap-2 mb-3">
-                      <Badge variant="secondary">{keyword}</Badge>
+                    <div className="flex items-center gap-2 mb-3 flex-wrap">
+                      <Badge variant="secondary" className="text-xs sm:text-sm">{keyword}</Badge>
                       {result.success ? (
                         <Badge variant="outline" className="text-xs">
                           {(() => {
@@ -473,7 +481,7 @@ export default function Home() {
                       (() => {
                         const availableImages = result.images.filter(image => !failedImages.has(image.url));
                         return availableImages.length > 0 ? (
-                          <div className="grid grid-cols-5 gap-3">
+                          <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-2 sm:gap-3">
                             {availableImages.map((image, index) => (
                               <button
                                 key={index}
@@ -489,25 +497,25 @@ export default function Home() {
                                   alt={image.title}
                                   fill
                                   className="object-cover"
-                                  sizes="(max-width: 768px) 50vw, (max-width: 1200px) 20vw, 15vw"
+                                  sizes="(max-width: 640px) 50vw, (max-width: 768px) 33vw, (max-width: 1024px) 25vw, 20vw"
                                   onError={() => handleImageError(image.url)}
                                 />
                                 {searchState.selectedImages[keyword]?.url === image.url && (
                                   <div className="absolute inset-0 bg-primary/10 flex items-center justify-center">
-                                    <CheckCircle2 className="h-6 w-6 text-primary bg-background rounded-full" />
+                                    <CheckCircle2 className="h-5 w-5 sm:h-6 sm:w-6 text-primary bg-background rounded-full" />
                                   </div>
                                 )}
                               </button>
                             ))}
                           </div>
                         ) : (
-                          <div className="text-sm text-muted-foreground p-4 text-center bg-muted rounded-lg">
+                          <div className="text-xs sm:text-sm text-muted-foreground p-3 sm:p-4 text-center bg-muted rounded-lg">
                             Images unavailable - all sources failed to load
                           </div>
                         );
                       })()
                     ) : (
-                      <div className="text-sm text-muted-foreground p-4 text-center bg-muted rounded-lg">
+                      <div className="text-xs sm:text-sm text-muted-foreground p-3 sm:p-4 text-center bg-muted rounded-lg">
                         {result.error || "No images found"}
                       </div>
                     )}
@@ -515,9 +523,9 @@ export default function Home() {
                 ))}
               </div>
             ) : (
-              <div className="text-center text-muted-foreground py-12">
-                <Search className="h-12 w-12 mx-auto mb-4 opacity-50" />
-                <p>Enter keywords and click search to find images</p>
+              <div className="text-center text-muted-foreground py-8 sm:py-12">
+                <Search className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 opacity-50" />
+                <p className="text-sm sm:text-base">Enter keywords and click search to find images</p>
               </div>
             )}
             
