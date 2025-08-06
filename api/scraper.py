@@ -71,6 +71,10 @@ def search_multiple_keywords(keywords, max_keywords=10, max_results_per_keyword=
     }
 
 def handler(request):
+    from http import HTTPStatus
+    from urllib.parse import parse_qs
+    import json as json_module
+    
     # Handle CORS preflight requests
     if request.method == 'OPTIONS':
         return {
@@ -90,14 +94,23 @@ def handler(request):
                 'Content-Type': 'application/json',
                 'Access-Control-Allow-Origin': '*'
             },
-            'body': json.dumps({
+            'body': json_module.dumps({
                 'success': False,
                 'error': 'Method not allowed'
             }, ensure_ascii=False)
         }
     
     try:
-        request_data = request.json
+        # Parse request body
+        if hasattr(request, 'get_json'):
+            request_data = request.get_json()
+        elif hasattr(request, 'json'):
+            request_data = request.json
+        else:
+            body = request.body if hasattr(request, 'body') else request.data
+            if isinstance(body, bytes):
+                body = body.decode('utf-8')
+            request_data = json_module.loads(body)
         
         # 단일 쿼리 처리
         if 'query' in request_data:
@@ -112,7 +125,7 @@ def handler(request):
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
-                'body': json.dumps(result, ensure_ascii=False, indent=2)
+                'body': json_module.dumps(result, ensure_ascii=False, indent=2)
             }
             
         # 다중 키워드 처리
@@ -132,7 +145,7 @@ def handler(request):
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
-                'body': json.dumps(result, ensure_ascii=False, indent=2)
+                'body': json_module.dumps(result, ensure_ascii=False, indent=2)
             }
             
         else:
@@ -147,8 +160,36 @@ def handler(request):
                     'Content-Type': 'application/json',
                     'Access-Control-Allow-Origin': '*'
                 },
-                'body': json.dumps(error_response, ensure_ascii=False, indent=2)
+                'body': json_module.dumps(error_response, ensure_ascii=False, indent=2)
             }
+            
+    except json_module.JSONDecodeError:
+        error_response = {
+            'success': False,
+            'error': 'Invalid JSON in request body'
+        }
+        return {
+            'statusCode': 400,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json_module.dumps(error_response, ensure_ascii=False, indent=2)
+        }
+        
+    except Exception as e:
+        error_response = {
+            'success': False,
+            'error': f'Internal server error: {str(e)}'
+        }
+        return {
+            'statusCode': 500,
+            'headers': {
+                'Content-Type': 'application/json',
+                'Access-Control-Allow-Origin': '*'
+            },
+            'body': json_module.dumps(error_response, ensure_ascii=False, indent=2)
+        }
             
     except json.JSONDecodeError:
         error_response = {
