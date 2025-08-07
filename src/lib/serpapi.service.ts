@@ -50,6 +50,14 @@ export interface SearchFilters {
 interface SerpAPIResponse {
   error?: string
   images_results?: SerpAPIImageResult[]
+  search_information?: {
+    image_results_state?: string
+  }
+  search_parameters?: {
+    q?: string
+    image_type?: string
+    licenses?: string
+  }
 }
 
 // Simple counter for API key rotation
@@ -78,6 +86,13 @@ function getEnvironmentApiKey(): string | undefined {
 
 function parseSerpAPIError(errorMessage: string, userApiKey?: string): string {
   const lowerError = errorMessage.toLowerCase()
+  
+  // Check for empty results due to strict filters
+  if (lowerError.includes("hasn't returned any results for this query") || 
+      lowerError.includes("no results found") ||
+      lowerError.includes("fully empty")) {
+    return 'No images found with the current filters. Try removing some filters (like image type, license, or date restrictions) to get more results.'
+  }
   
   // Check for specific SERPAPI error patterns
   if (lowerError.includes('invalid api key') || lowerError.includes('unauthorized')) {
@@ -122,9 +137,9 @@ function parseSerpAPIError(errorMessage: string, userApiKey?: string): string {
   
   // Default fallback error message
   if (userApiKey) {
-    return `Search failed: ${errorMessage}. Please try again or check your API key in Settings.`
+    return `${errorMessage} Please try again or check your API key in Settings.`
   } else {
-    return `Demo search failed: ${errorMessage}. For reliable access, please provide your own SERPAPI key in Settings.`
+    return `${errorMessage} For reliable access, please provide your own SERPAPI key in Settings.`
   }
 }
 
@@ -184,6 +199,18 @@ async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, us
     })
 
     const images: ImageResult[] = []
+    
+    // Check if results are empty due to filters
+    if (result.search_information?.image_results_state === "Fully empty" || 
+        (result.error && result.error.toLowerCase().includes("hasn't returned any results"))) {
+      return {
+        success: false,
+        query,
+        count: 0,
+        images: [],
+        error: parseSerpAPIError("No results found with current filters", userApiKey)
+      }
+    }
     
     if (result.images_results && Array.isArray(result.images_results)) {
       for (const imageResult of result.images_results.slice(0, maxResults)) {
