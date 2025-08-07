@@ -65,6 +65,14 @@ python scripts/scraper.py
 
 **API 키 로테이션**: 여러 키를 설정하여 자동 로드 밸런싱 및 속도 제한 분산이 가능합니다.
 
+#### 🔐 API 키 보안
+
+**브라우저 저장**: 설정에서 API 키를 구성할 때:
+- 편의를 위해 브라우저 `localStorage`에 키 저장
+- ⚠️ **보안 공지**: 손상된 웹사이트에서 XSS 공격에 취약
+- **권장사항**: 프로덕션 배포 시 환경 변수 사용
+- **모범 사례**: 신뢰할 수 없는 컴퓨터나 공유 세션에서 사용 금지
+
 ### API 키 사용량 모니터링
 
 GetImages는 API 키 사용량을 자동으로 모니터링하고 키 로테이션을 지능적으로 관리합니다:
@@ -142,12 +150,34 @@ get-images/
 │   │   ├── api/scraper/     # API 엔드포인트 (SERPAPI)
 │   │   └── page.tsx         # 메인 애플리케이션
 │   ├── components/ui/       # shadcn/ui 컴포넌트
-│   ├── lib/                 # 유틸리티 & 캐싱
-│   └── hooks/               # React 훅
+│   ├── lib/                 # 핵심 유틸리티
+│   │   ├── serpapi.service.ts  # 데이터 기반 오류 처리 & API 관리
+│   │   ├── cache.ts         # 지능적 캐싱 시스템
+│   │   └── api-key-storage.ts  # 보안 API 키 관리
+│   ├── hooks/               # 중앙화된 로직을 가진 React 훅
+│   │   └── use-image-search.ts # 중앙화된 API 키 처리
+│   └── types/               # TypeScript 정의
 ├── scripts/
 │   └── scraper.py          # CLI 스크립트 (DuckDuckGo)
 └── requirements.txt        # Python 의존성
 ```
+
+### 🛡️ 아키텍처 개요
+
+**타입 안전 API 키 관리**:
+- `ApiKeyConfig` 인터페이스를 통한 일관된 키 처리
+- `useImageSearch` 훅에서 중앙화된 로직
+- 환경 변수와 사용자 제공 키 모두 지원
+
+**지능적 오류 처리**:
+- `SERPAPI_ERROR_MAP`에서 패턴 기반 오류 매핑
+- 다양한 시나리오에 대한 맥락 인식 오류 메시지
+- 다양한 API 실패 조건에 대한 우아한 대체
+
+**스마트 키 선택**:
+- 사용량 기반 검증으로 기능적 키 우선순위 설정
+- 소진된 키 자동 제외
+- 키 상태 및 할당량 실시간 모니터링
 
 ---
 

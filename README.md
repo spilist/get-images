@@ -65,6 +65,14 @@ python scripts/scraper.py
 
 **API Key Rotation**: Configure multiple keys for automatic load balancing and rate limit distribution.
 
+#### 🔐 API Key Security
+
+**Browser Storage**: When configuring your API key through Settings:
+- Keys stored in browser `localStorage` for convenience
+- ⚠️ **Security Notice**: Vulnerable to XSS attacks on compromised websites
+- **Recommendations**: Use environment variables for production deployments
+- **Best Practice**: Avoid using on untrusted computers or shared sessions
+
 ### API Key Usage Monitoring
 
 GetImages automatically monitors your API key usage and intelligently manages key rotation:
@@ -142,12 +150,34 @@ get-images/
 │   │   ├── api/scraper/     # API endpoint (SERPAPI)
 │   │   └── page.tsx         # Main application
 │   ├── components/ui/       # shadcn/ui components
-│   ├── lib/                 # Utilities & caching
-│   └── hooks/               # React hooks
+│   ├── lib/                 # Core utilities
+│   │   ├── serpapi.service.ts  # Data-driven error handling & API management
+│   │   ├── cache.ts         # Intelligent caching system
+│   │   └── api-key-storage.ts  # Secure API key management
+│   ├── hooks/               # React hooks with centralized logic
+│   │   └── use-image-search.ts # Centralized API key handling
+│   └── types/               # TypeScript definitions
 ├── scripts/
 │   └── scraper.py          # CLI script (DuckDuckGo)
 └── requirements.txt        # Python dependencies
 ```
+
+### 🛡️ Architecture Overview
+
+**Type-Safe API Key Management**:
+- Consistent key handling through `ApiKeyConfig` interface
+- Centralized logic in `useImageSearch` hook
+- Support for both environment and user-provided keys
+
+**Intelligent Error Handling**:
+- Pattern-based error mapping in `SERPAPI_ERROR_MAP`
+- Context-aware error messages for different scenarios
+- Graceful fallback for various API failure conditions
+
+**Smart Key Selection**:
+- Usage-based validation prioritizes functional keys
+- Automatic exclusion of exhausted keys
+- Real-time monitoring of key status and quotas
 
 ---
 

@@ -1,31 +1,49 @@
 # Code Style and Conventions
 
 ## TypeScript/React Conventions
-- **File Extensions**: `.tsx` for React components, `.ts` for utilities
-- **Component Style**: Function components with TypeScript
-- **Naming**: PascalCase for components (e.g., `RootLayout`, `Home`)
-- **Imports**: ES modules with explicit imports
+- **File Extensions**: `.tsx` for React components, `.ts` for utilities and services
+- **Component Style**: Function components with TypeScript interfaces
+- **Naming**: PascalCase for components (e.g., `SettingsDialog`, `SearchPanel`)
+- **Hooks**: Custom hooks prefixed with `use` (e.g., `useImageSearch`, `useApiKey`)
+- **Imports**: ES modules with path aliases (`@/*` maps to `./src/*`)
 - **TypeScript**: Strict mode enabled, proper typing required
 
-## Code Formatting
-- **ESLint**: Uses Next.js core-web-vitals and TypeScript configs
-- **Style**: Standard Next.js/React formatting patterns
-- **Imports**: Path aliases configured (`@/*` maps to `./src/*`)
+## Code Architecture Patterns
+- **API Key Management**: Use `ApiKeyConfig` interface consistently
+- **Hook Design**: Centralize business logic in hooks, keep UI components presentational
+- **Error Handling**: Add patterns to `SERPAPI_ERROR_MAP` in `serpapi.service.ts`
+- **State Management**: Use custom hooks for complex state (no external state management)
 
-## CSS/Styling
-- **Framework**: Tailwind CSS v4 with inline theme configuration
-- **CSS Variables**: Custom properties for colors and fonts
-- **Dark Mode**: Automatic dark mode support via media queries
-- **Fonts**: Geist Sans and Geist Mono (optimized loading)
+## API Design Conventions
+- **Next.js API Routes**: Located in `src/app/api/` directory
+- **Response Format**: Consistent JSON with `success`, `error`, and data fields
+- **Error Handling**: Context-aware messages for user vs environment API keys
+- **Caching**: Implement through `src/lib/cache.ts` utility
 
-## Python Conventions
-- **API Functions**: Serverless function handlers
-- **Error Handling**: Try-catch with descriptive error messages
-- **Docstrings**: Korean language documentation in functions
-- **Dependencies**: Minimal dependencies (only `ddgs` required)
+## Security Practices
+- **API Keys**: Never log or expose keys in client-side code
+- **Masking**: Show only last 8 characters of API keys in UI
+- **Warnings**: Display XSS warnings for localStorage usage
+- **Validation**: Validate API key formats before storage
 
-## Project Patterns
-- **API Design**: RESTful endpoints with JSON responses
-- **Error Responses**: Consistent structure with `success`, `error` fields
-- **CORS**: Enabled for frontend integration
-- **Rate Limiting**: 1-second delays for bulk operations
+## CSS/Styling Conventions
+- **Framework**: shadcn/ui components with Tailwind CSS
+- **Button Styling**: All buttons must have `cursor: pointer`
+- **Component Library**: Use shadcn/ui components for consistency
+- **Dark Mode**: Automatic support via Tailwind dark mode classes
+
+## File Organization
+```
+src/
+├── app/                    # Next.js App Router pages and API routes
+├── components/             # React components (UI-focused)
+├── hooks/                  # Custom hooks (business logic)
+├── lib/                    # Utilities and services
+└── types/                  # TypeScript type definitions
+```
+
+## Code Quality
+- **ESLint**: Use Next.js recommended configuration
+- **TypeScript**: Maintain strict typing, avoid `any` types
+- **Comments**: Minimal comments, prefer self-documenting code
+- **Error Messages**: User-friendly messages with actionable guidance

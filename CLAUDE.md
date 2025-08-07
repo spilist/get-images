@@ -42,97 +42,122 @@ The project uses different image search APIs for different contexts:
 ### Frontend Structure
 - **Framework**: TypeScript/React with Next.js 15 App Router
 - **UI**: shadcn/ui components with Tailwind CSS
-- **API Key Management**: LocalStorage with environment variable fallback
+- **API Key Management**: Type-safe handling via `ApiKeyConfig` interface
 - **Components**: Located in `src/components/ui/`
+- **Hooks**: Business logic abstracted in `src/hooks/`
 
 ### API Structure
-- `src/app/api/scraper/route.ts` - Next.js API route using SERPAPI
+- `src/app/api/scraper/route.ts` - Main image search API endpoint
+- `src/app/api/usage/route.ts` - API key usage monitoring endpoint
+- `src/lib/serpapi.service.ts` - SERPAPI integration and error handling
+- `src/hooks/use-image-search.ts` - Search functionality and API key management
 - `scripts/scraper.py` - Standalone Python CLI script using DuckDuckGo
 - `requirements.txt` - Python dependencies for CLI usage
 
 ### Key Features
-- **API Key Flexibility**: Users can provide their own SERPAPI key or use the environment default
-- **API Key Rotation**: Automatic rotation between multiple environment keys for load balancing
-- **In-Memory Caching**: 24-hour cache for search results to reduce API calls and improve performance
-- **Immediate Usability**: Works out-of-the-box with environment SERPAPI_KEY
-- **Dual Usage**: Web interface for interactive use, CLI for batch processing
-- **Error Handling**: Graceful fallbacks and user feedback
+- **API Key Management**: Support for environment and user-provided SERPAPI keys
+- **Intelligent Caching**: In-memory cache reduces API calls and improves performance
+- **Error Handling**: Pattern-based error mapping with user-friendly messages
+- **Usage Monitoring**: Real-time API key quota tracking
 
 ### API Endpoints
-- `POST /api/scraper` - Web API endpoint supporting:
-  - Single query: `{"query": "keyword", "max_results": 3}`
-  - Multiple keywords: `{"keywords": ["keyword1", "keyword2"], "max_keywords": 10}`
-  - Optional user API key in request headers or body
+- `POST /api/scraper` - Main image search API
+  - Supports single/multiple keyword searches
+  - Optional user API key via headers or body
+- `GET /api/usage` - API key usage monitoring
+  - Returns quota and usage statistics
+  - Supports `X-API-Key` header for user keys
 
 ### Environment Setup
-
-#### Web Application (SERPAPI)
-1. Get API key from https://serpapi.com/manage-api-key
-2. Set `SERPAPI_KEY` environment variable for default usage
-3. Optionally set `SERPAPI_KEY2` for automatic key rotation and load balancing
-4. Users can optionally override with their own key in the UI
-
-#### CLI Script (DuckDuckGo)
-1. Install dependencies: `pip install -r requirements.txt`
-2. Run: `python scripts/scraper.py`
-3. No API key required (uses free DuckDuckGo search)
+1. Set `SERPAPI_KEY` environment variable
+2. Optionally set `SERPAPI_KEY2` for automatic key rotation  
+3. Users can override with personal keys via Settings UI
 
 ## API Key Management
 
-The application supports flexible API key configuration:
+**Type Safety**: Uses `ApiKeyConfig` interface for consistent key handling:
+```typescript
+interface ApiKeyConfig {
+  apiKey: string;
+  source: 'environment' | 'user';
+  isValid: boolean;
+}
+```
 
-1. **Environment Default**: Uses `SERPAPI_KEY` from environment variables
-2. **User Override**: Users can set their own key in the UI settings
-3. **Fallback Logic**: User key takes precedence, falls back to environment key
-4. **Persistence**: User keys stored in browser localStorage
-
-This approach allows:
-- Immediate functionality for new users
-- Personal API key usage for heavy users
-- Easy deployment and self-hosting
+**Key Selection**:
+- User keys (via Settings UI) take precedence over environment keys
+- `useImageSearch` hook handles key selection logic
+- Automatic fallback from user → environment keys
+- Keys stored in localStorage with XSS security warnings
 
 ## Caching System
 
-The application implements an in-memory caching system to reduce redundant API calls and improve performance:
+In-memory caching implemented in `src/lib/cache.ts`:
+- **TTL**: 24-hour cache for search results
+- **Key Strategy**: `${query}:${max_results}:${api_key_hash}`
+- **Benefits**: Eliminates duplicate API calls, improves performance
 
-### Cache Implementation
-- **Location**: `src/lib/cache.ts` - Generic in-memory cache utility
-- **Integration**: Applied in `searchImagesWithSerpAPI` function in API route
-- **Type**: In-memory Map with TTL (Time To Live) support
+## Error Handling System
 
-### Cache Configuration
-- **Default TTL**: 24 hours (86400000ms) for search results
-- **Max Entries**: 1000 cached search results
-- **Cleanup**: Automatic cleanup every 1 hour to remove expired entries
-- **Key Strategy**: `${normalized_query}:${max_results}:${api_key_hash}`
+Pattern-based error mapping in `src/lib/serpapi.service.ts` using `SERPAPI_ERROR_MAP`:
+- Context-aware messages (different for user vs environment keys)  
+- Handles API key issues, quota limits, service errors
+- Uses `getValidApiKey()` to find non-exhausted keys automatically
 
-### Cache Features
-- **Automatic Expiration**: Entries automatically expire after 24 hours
-- **Memory Management**: LRU-style eviction when max size is reached
-- **API Key Awareness**: Different cache entries for different API keys
-- **Query Normalization**: Case-insensitive and trimmed query matching
-- **Graceful Fallback**: Cache failures don't break API functionality
+## API Usage Monitoring
 
-### Cache Benefits
-- **Cost Reduction**: Eliminates duplicate SERPAPI calls for repeated searches
-- **Performance**: Cached results return in <10ms vs API call latency
-- **User Experience**: Instant results for previously searched queries
-- **Rate Limit Protection**: Reduces API usage against rate limits
-
-### Technical Details
-- Cache keys include query, max_results, and API key hash for proper isolation
-- Successful search results only are cached (errors are not cached)
-- Console logging for cache hits/misses and cleanup operations
-- Thread-safe operations with automatic cleanup timers
+`GET /api/usage` endpoint provides key usage statistics:
+- Returns remaining quotas and current usage
+- Used by Settings dialog and `getValidApiKey()` function  
+- Supports `X-API-Key` header for user-specific checks
 
 ## Deployment
 
-Configured for Vercel deployment with:
-- Automatic Next.js detection and deployment
-- Environment variable support for SERPAPI_KEY
-- Static file serving for CLI scripts and requirements
+Vercel deployment ready with environment variable support for `SERPAPI_KEY`.
 
 ## UI/UX Guidelines
 
-### Styling Considerations
-- Make sure all buttons should have cursor:pointer.
+- All buttons should have `cursor: pointer`
+
+## Development Guidelines
+
+### Code Architecture
+
+**API Key Management**:
+- Use `ApiKeyConfig` interface for all key handling operations
+- Pass configuration objects rather than string keys between components
+- Implement key decision logic in hooks (`useImageSearch`), not UI components
+- Handle user and environment keys consistently through the same interface
+
+**Error Handling**:
+- Add new error patterns to `SERPAPI_ERROR_MAP` array in `serpapi.service.ts`
+- Use pattern-based matching for flexible error detection
+- Provide context-aware messages (different for user vs environment keys)
+- Keep error handling logic separate from UI components
+
+**Hook Design Patterns**:
+- Abstract business logic in custom hooks
+- Return consistent state objects with `isLoading`, `error`, and `results`
+- Use TypeScript interfaces for all hook return types
+- Handle async operations and error states within hooks
+
+### Security Best Practices
+
+**API Key Handling**:
+- Display XSS warnings when users store keys in localStorage
+- Mask API keys in UI (show only last 8 characters)
+- Recommend environment variables for production deployments
+- Validate API key formats before storage
+
+**Type Safety**:
+- Use strict TypeScript types for all API key configurations
+- Define union types for key sources: `'user' | 'environment'`
+- Validate API responses match expected TypeScript interfaces
+- Handle undefined/null states explicitly in key management logic
+
+### Component Organization
+
+**UI Components**: Focus on presentation and user interaction
+**Hooks**: Handle state management, API calls, and business logic  
+**Services**: Provide utility functions and external API integration
+**Types**: Define interfaces for consistent data structures across the app
