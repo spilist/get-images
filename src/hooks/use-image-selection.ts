@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { ImageResult, SelectedImages, MultipleKeywordsResponse } from "@/types/api";
 import { SearchFilters } from "@/lib/serpapi.service";
+import { SearchFiltersWithLabels, addLabelsToFilters } from "@/lib/filter-labels";
 
 interface UseImageSelectionReturn {
   selectedImages: SelectedImages;
@@ -12,7 +13,7 @@ interface UseImageSelectionReturn {
 
 export function useImageSelection(
   results: MultipleKeywordsResponse | null,
-  onAddToHistory?: (keywords: string[], selectedImages: { [keyword: string]: { url: string; title: string; } }, searchFilters?: SearchFilters) => void,
+  onAddToHistory?: (keywords: string[], selectedImages: { [keyword: string]: { url: string; title: string; } }, searchFilters?: SearchFiltersWithLabels) => void,
   searchFilters?: SearchFilters
 ): UseImageSelectionReturn {
   const [selectedImages, setSelectedImages] = useState<SelectedImages>({});
@@ -47,33 +48,36 @@ export function useImageSelection(
           };
         });
         
-        onAddToHistory(keywords, selectedImageData, searchFilters);
+        onAddToHistory(keywords, selectedImageData, searchFilters ? addLabelsToFilters(searchFilters) : undefined);
       }
     }
   }, [results, onAddToHistory, searchFilters]);
 
   const selectImage = useCallback((keyword: string, image: ImageResult) => {
-    setSelectedImages(prev => ({
-      ...prev,
-      [keyword]: image
-    }));
-    
-    // Update history with the new selection
-    if (onAddToHistory && results?.results) {
-      const keywords = Object.keys(results.results);
-      const updatedSelections = { ...selectedImages, [keyword]: image };
-      const selectedImageData: { [keyword: string]: { url: string; title: string; } } = {};
+    setSelectedImages(prev => {
+      const updatedSelections = {
+        ...prev,
+        [keyword]: image
+      };
       
-      Object.entries(updatedSelections).forEach(([kw, img]) => {
-        selectedImageData[kw] = {
-          url: img.url,
-          title: img.title
-        };
-      });
+      // Update history with the new selection immediately using the correct state
+      if (onAddToHistory && results?.results) {
+        const keywords = Object.keys(results.results);
+        const selectedImageData: { [keyword: string]: { url: string; title: string; } } = {};
+        
+        Object.entries(updatedSelections).forEach(([kw, img]) => {
+          selectedImageData[kw] = {
+            url: img.url,
+            title: img.title
+          };
+        });
+        
+        onAddToHistory(keywords, selectedImageData, searchFilters ? addLabelsToFilters(searchFilters) : undefined);
+      }
       
-      onAddToHistory(keywords, selectedImageData, searchFilters);
-    }
-  }, [onAddToHistory, searchFilters, results, selectedImages]);
+      return updatedSelections;
+    });
+  }, [onAddToHistory, searchFilters, results]);
 
   const findNextAvailableImage = useCallback((keyword: string, failedUrl: string) => {
     if (!results?.results) return;

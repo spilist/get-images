@@ -64,6 +64,22 @@ python scripts/scraper.py
 
 **API Key Rotation**: Configure multiple keys for automatic load balancing and rate limit distribution.
 
+### Search Engine Options
+
+GetImages supports two search engine modes, each optimized for different use cases:
+
+| Engine | Speed | Image Quality | Use Case |
+|--------|-------|---------------|----------|
+| **Google Images Light** | ⚡ Fast | 📱 Thumbnails | Quick preview, content discovery |
+| **Google Images Full** (Default) | 🐌 Slower | 🖼️ Full Resolution | Production use, high-quality needs |
+
+**Configuration**: Change engine in Settings → Search Options → Search Engine
+
+### Advanced Filter Options
+
+For detailed information about image filters (licenses, sizes, types, etc.), visit:
+[SERPAPI Google Images API Documentation](https://serpapi.com/google-images-api)
+
 ---
 
 ## ⚡ Performance Features

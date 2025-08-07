@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 
 import { Badge } from '@/components/ui/badge';
 import { formatRelativeTime } from '@/lib/search-history-storage';
+import { getFilterLabels } from '@/lib/filter-labels';
 import { 
   Clock, 
   Search, 
@@ -58,25 +59,9 @@ export function SearchHistory({
     }
   };
 
+  // Simplified filter formatting using centralized utility
   const formatFilters = (entry: SearchHistoryEntry) => {
-    if (!entry.searchFilters) return [];
-    
-    const filters = [];
-    const { searchFilters } = entry;
-    
-    if (searchFilters.hl) filters.push(`Language: ${searchFilters.hl}`);
-    if (searchFilters.imgar) filters.push(`Aspect: ${searchFilters.imgar}`);
-    if (searchFilters.imgsz) filters.push(`Size: ${searchFilters.imgsz}`);
-    if (searchFilters.image_type) filters.push(`Type: ${searchFilters.image_type}`);
-    if (searchFilters.licenses) filters.push(`License: ${searchFilters.licenses}`);
-    if (searchFilters.safe) filters.push(`Safe: ${searchFilters.safe}`);
-    if (searchFilters.start_date) {
-      const date = searchFilters.start_date;
-      const formatted = `${date.slice(0, 4)}-${date.slice(4, 6)}-${date.slice(6, 8)}`;
-      filters.push(`From: ${formatted}`);
-    }
-    
-    return filters;
+    return entry.searchFilters ? getFilterLabels(entry.searchFilters) : [];
   };
 
   if (history.length === 0) {
@@ -92,12 +77,10 @@ export function SearchHistory({
   }
 
   return (
-    <div className="max-h-96 overflow-y-auto">
-      <div className="flex items-center justify-between mb-4 px-1">
-        <div className="flex items-center gap-2">
-          <Clock className="h-4 w-4 text-muted-foreground" />
-          <h3 className="font-medium">Search History</h3>
-          <span className="text-sm text-muted-foreground">({history.length})</span>
+    <div className="max-h-[60vh] overflow-y-auto">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <span>{history.length} item{history.length !== 1 ? 's' : ''}</span>
         </div>
         {history.length > 0 && (
           <Button
@@ -151,41 +134,48 @@ export function SearchHistory({
               
               {/* Show selected images preview */}
               {selectedImageCount > 0 && (
-                <div className="flex gap-2 mb-3 overflow-x-auto">
-                  {Object.entries(entry.selectedImages).map(([keyword, image]) => (
-                    <div key={keyword} className="flex-shrink-0">
-                      <div className="w-12 h-12 rounded overflow-hidden bg-muted flex items-center justify-center">
-                        <img
-                          src={image.url}
-                          alt={image.title}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            const img = e.target as HTMLImageElement;
-                            img.style.display = 'none';
-                            const parent = img.parentElement;
-                            if (parent && !parent.querySelector('svg')) {
-                              parent.innerHTML = '<svg class="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-3.086-3.086a2 2 0 00-2.828 0L6 21"/></svg>';
-                            }
-                          }}
-                        />
+                <div className="flex gap-2 mb-3 overflow-x-auto pb-2">
+                  <div className="flex gap-2 min-w-0">
+                    {Object.entries(entry.selectedImages).map(([keyword, image]) => (
+                      <div key={keyword} className="flex-shrink-0">
+                        <div className="w-12 h-12 rounded overflow-hidden bg-muted flex items-center justify-center">
+                          <img
+                            src={image.url}
+                            alt={image.title}
+                            className="w-full h-full object-cover"
+                            onError={(e) => {
+                              const img = e.target as HTMLImageElement;
+                              img.style.display = 'none';
+                              const parent = img.parentElement;
+                              if (parent && !parent.querySelector('svg')) {
+                                parent.innerHTML = '<svg class="h-4 w-4 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="m21 15-3.086-3.086a2 2 0 00-2.828 0L6 21"/></svg>';
+                              }
+                            }}
+                          />
+                        </div>
+                        <p className="text-xs text-center mt-1 truncate w-12" title={keyword}>
+                          {keyword}
+                        </p>
                       </div>
-                      <p className="text-xs text-center mt-1 truncate w-12" title={keyword}>
-                        {keyword}
-                      </p>
-                    </div>
-                  ))}
+                    ))}
+                  </div>
                 </div>
               )}
               
-              <div className="flex items-center justify-between">
-                <div className="flex flex-wrap gap-1">
-                  {filters.map((filter, idx) => (
-                    <Badge key={idx} variant="outline" className="text-xs">
-                      {filter}
-                    </Badge>
-                  ))}
-                </div>
-                <div className="flex gap-2">
+              <div className="flex flex-col gap-3">
+                {/* Filters */}
+                {filters.length > 0 && (
+                  <div className="flex flex-wrap gap-1">
+                    {filters.map((filter, idx) => (
+                      <Badge key={idx} variant="outline" className="text-xs">
+                        {filter}
+                      </Badge>
+                    ))}
+                  </div>
+                )}
+                
+                {/* Actions */}
+                <div className="flex justify-end gap-2">
                   <Button
                     variant="outline"
                     size="sm"
@@ -198,7 +188,7 @@ export function SearchHistory({
                     ) : (
                       <Copy className="h-3 w-3 mr-1" />
                     )}
-                    {isCopying ? 'Copied!' : 'Copy Results'}
+                    {isCopying ? 'Copied!' : 'Copy'}
                   </Button>
                   <Button
                     variant="outline"

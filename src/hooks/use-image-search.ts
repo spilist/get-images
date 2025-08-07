@@ -104,6 +104,7 @@ export function useImageSearch(): UseImageSearchReturn {
         keywords: string[];
         max_results_per_keyword: number;
         api_key?: string;
+        filters?: SearchFilters;
       } = {
         keywords,
         max_results_per_keyword: 5
@@ -111,6 +112,10 @@ export function useImageSearch(): UseImageSearchReturn {
 
       if (apiKey) {
         requestBody.api_key = apiKey;
+      }
+
+      if (searchFilters) {
+        requestBody.filters = searchFilters;
       }
 
       const response = await fetch("/api/scraper", {

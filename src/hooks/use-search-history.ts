@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { SearchHistoryEntry } from '@/types/api';
 import { SearchFilters } from '@/lib/serpapi.service';
+import { SearchFiltersWithLabels } from '@/lib/filter-labels';
 import {
   getSearchHistory,
   addToSearchHistory,
@@ -10,7 +11,7 @@ import {
 
 export interface UseSearchHistoryReturn {
   history: SearchHistoryEntry[];
-  addToHistory: (keywords: string[], selectedImages: { [keyword: string]: { url: string; title: string; } }, searchFilters?: SearchFilters) => void;
+  addToHistory: (keywords: string[], selectedImages: { [keyword: string]: { url: string; title: string; } }, searchFilters?: SearchFiltersWithLabels) => void;
   removeFromHistory: (keywords: string[]) => void;
   clearHistory: () => void;
   rerunSearch: (entry: SearchHistoryEntry) => Promise<void>;
@@ -29,7 +30,7 @@ export function useSearchHistory(
   const addToHistory = useCallback((
     keywords: string[],
     selectedImages: { [keyword: string]: { url: string; title: string; } },
-    searchFilters?: SearchFilters
+    searchFilters?: SearchFiltersWithLabels
   ) => {
     addToSearchHistory(keywords, selectedImages, searchFilters);
     setHistory(getSearchHistory()); // Refresh state

@@ -186,16 +186,16 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
   const handleSaveFilters = () => {
     const success = storeSearchFilters(searchFilters);
     if (success) {
-      setSuccess("Search filters saved successfully!");
+      setSuccess("Search options saved successfully!");
     } else {
-      setError("Failed to save search filters.");
+      setError("Failed to save search options.");
     }
   };
 
   const handleResetFilters = () => {
     setSearchFilters({});
     setStartDate(undefined);
-    setSuccess("Search filters reset to default.");
+    setSuccess("Search options reset to default.");
   };
 
   const defaultTrigger = (
@@ -218,7 +218,7 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
             Settings
           </DialogTitle>
           <DialogDescription>
-            Configure your SERPAPI key and search filters.
+            Configure your SERPAPI key and search options.
           </DialogDescription>
         </DialogHeader>
 
@@ -355,28 +355,59 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
 
           <Separator />
 
-          {/* Search Filters Section */}
+          {/* Search Options Section */}
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
-                <h3 className="text-lg font-semibold">Search Filters</h3>
+                <h3 className="text-lg font-semibold">Search Options</h3>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={handleResetFilters}>
                   Reset
                 </Button>
                 <Button size="sm" onClick={handleSaveFilters}>
-                  Save Filters
+                  Save Options
                 </Button>
               </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* Licenses - Priority filter */}
-              <div className="col-span-full space-y-2">
-                <Label htmlFor="licenses" className="text-sm font-medium text-orange-600">
-                  Licenses (Priority Filter)
+              {/* Engine Selection */}
+              <div className="space-y-2">
+                <Label htmlFor="engine" className="text-sm font-medium">
+                  Search Engine
+                </Label>
+                <Select
+                  value={searchFilters.engine || 'google_images'}
+                  onValueChange={(value: 'google_images' | 'google_images_light') => updateFilter('engine', value)}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select search engine">
+                      {searchFilters.engine === 'google_images_light' ? 'Google Images Light (Fast)' : 'Google Images (Full)'}
+                    </SelectValue>
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="google_images_light">
+                      <div className="flex flex-col">
+                        <span>Google Images Light (Fast)</span>
+                        <span className="text-xs text-muted-foreground">Faster but thumbnail images only</span>
+                      </div>
+                    </SelectItem>
+                    <SelectItem value="google_images">
+                      <div className="flex flex-col">
+                        <span>Google Images (Full)</span>
+                        <span className="text-xs text-muted-foreground">Slower but full resolution images</span>
+                      </div>
+                    </SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* Licenses */}
+              <div className="space-y-2">
+                <Label htmlFor="licenses" className="text-sm font-medium">
+                  Licenses
                 </Label>
                 <Select
                   value={searchFilters.licenses || 'all'}

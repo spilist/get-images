@@ -52,5 +52,5 @@ export interface SearchHistoryEntry {
   keywords: string[];
   selectedImages: { [keyword: string]: { url: string; title: string; } };
   timestamp: number;
-  searchFilters?: import('../lib/serpapi.service').SearchFilters;
+  searchFilters?: import('../lib/filter-labels').SearchFiltersWithLabels;
 }

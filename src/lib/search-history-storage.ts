@@ -39,11 +39,17 @@ export function addToSearchHistory(
   try {
     const currentHistory = getSearchHistory();
     
-    // Remove any existing entry with the same keywords combination
+    // Remove any existing entry with the same keywords combination AND filters
     const keywordsKey = keywords.sort().join('|');
-    const filteredHistory = currentHistory.filter(
-      entry => entry.keywords.sort().join('|') !== keywordsKey
-    );
+    const filtersKey = searchFilters ? JSON.stringify(searchFilters) : '';
+    const combinedKey = `${keywordsKey}:${filtersKey}`;
+    
+    const filteredHistory = currentHistory.filter(entry => {
+      const entryKeywordsKey = entry.keywords.sort().join('|');
+      const entryFiltersKey = entry.searchFilters ? JSON.stringify(entry.searchFilters) : '';
+      const entryCombinedKey = `${entryKeywordsKey}:${entryFiltersKey}`;
+      return entryCombinedKey !== combinedKey;
+    });
     
     // Create new entry
     const newEntry: SearchHistoryEntry = {

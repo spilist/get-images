@@ -26,6 +26,7 @@ interface SerpAPIImageResult {
   original?: string
   title?: string
   source?: string
+  thumbnail?: string
 }
 
 // Search filter types
@@ -36,6 +37,7 @@ export type ImageType = 'face' | 'photo' | 'clipart' | 'lineart' | 'animated'
 export type SafeSearch = 'active' | 'off'
 
 export interface SearchFilters {
+  engine?: 'google_images' | 'google_images_light'
   licenses?: LicenseType
   hl?: string // Language code
   start_date?: string // YYYYMMDD format
@@ -147,6 +149,7 @@ async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, us
   
   // Check cache first
   const cachedResult = searchCache.get(cacheKey)
+  
   if (cachedResult) {
     console.log(`Cache hit for query: "${query}"`)
     return cachedResult
@@ -155,7 +158,7 @@ async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, us
   try {
     const result = await new Promise<SerpAPIResponse>((resolve, reject) => {
       const searchParams: Record<string, string | number> = {
-        engine: "google_images_light",
+        engine: filters?.engine || "google_images",
         api_key: apiKey,
         q: query,
         tbm: "isch", // Image search parameter
@@ -187,6 +190,12 @@ async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, us
         if (imageResult.original) {
           images.push({
             url: imageResult.original,
+            title: imageResult.title || '',
+            source: imageResult.source || ''
+          })
+        } else if (imageResult.thumbnail) {
+          images.push({
+            url: imageResult.thumbnail,
             title: imageResult.title || '',
             source: imageResult.source || ''
           })
