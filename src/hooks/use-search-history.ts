@@ -24,7 +24,13 @@ export function useSearchHistory(
 
   // Load history from localStorage on mount
   useEffect(() => {
-    setHistory(getSearchHistory());
+    try {
+      setHistory(getSearchHistory());
+    } catch (error) {
+      // If storage fails, default to empty array
+      console.warn('Failed to load search history:', error);
+      setHistory([]);
+    }
   }, []);
 
   const addToHistory = useCallback((
@@ -32,23 +38,44 @@ export function useSearchHistory(
     selectedImages: { [keyword: string]: { url: string; title: string; } },
     searchFilters?: SearchFiltersWithLabels
   ) => {
-    addToSearchHistory(keywords, selectedImages, searchFilters);
-    setHistory(getSearchHistory()); // Refresh state
+    try {
+      addToSearchHistory(keywords, selectedImages, searchFilters);
+      setHistory(getSearchHistory()); // Refresh state
+    } catch (error) {
+      // If storage operation fails, continue with current state
+      console.warn('Failed to add to search history:', error);
+    }
   }, []);
 
   const removeFromHistory = useCallback((keywords: string[]) => {
-    removeFromSearchHistory(keywords);
-    setHistory(getSearchHistory()); // Refresh state
+    try {
+      removeFromSearchHistory(keywords);
+      setHistory(getSearchHistory()); // Refresh state
+    } catch (error) {
+      // If storage operation fails, continue with current state
+      console.warn('Failed to remove from search history:', error);
+    }
   }, []);
 
   const clearHistory = useCallback(() => {
-    clearSearchHistory();
-    setHistory([]);
+    try {
+      clearSearchHistory();
+      setHistory([]);
+    } catch (error) {
+      // If storage operation fails, still clear local state
+      console.warn('Failed to clear search history from storage:', error);
+      setHistory([]);
+    }
   }, []);
 
   const rerunSearch = useCallback(async (entry: SearchHistoryEntry) => {
     if (onRerunSearch) {
-      await onRerunSearch(entry.keywords, entry.searchFilters);
+      try {
+        await onRerunSearch(entry.keywords, entry.searchFilters);
+      } catch (error) {
+        // Allow the error to propagate to the caller for proper handling
+        throw error;
+      }
     }
   }, [onRerunSearch]);
 

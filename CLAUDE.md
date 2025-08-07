@@ -28,6 +28,12 @@ pnpm start
 
 # Lint the codebase
 pnpm lint
+
+# Test commands
+pnpm test          # Run all tests
+pnpm test:watch    # Run tests in watch mode
+pnpm test:coverage # Run tests with coverage report
+pnpm test:ci       # Run tests for CI (no watch, coverage)
 ```
 
 Alternative package managers can be used, but pnpm is recommended for consistency.
@@ -161,3 +167,84 @@ Vercel deployment ready with environment variable support for `SERPAPI_KEY`.
 **Hooks**: Handle state management, API calls, and business logic  
 **Services**: Provide utility functions and external API integration
 **Types**: Define interfaces for consistent data structures across the app
+
+## Testing Infrastructure
+
+### Testing Framework
+- **Jest 30+**: Primary testing framework with Next.js 15 support
+- **React Testing Library**: Component and hook testing
+- **MSW (Mock Service Worker)**: SERPAPI response mocking
+- **TypeScript**: Full type safety in all test files
+
+### Test Structure
+```
+__tests__/
+├── __mocks__/          # Global mocks (localStorage, SERPAPI responses)
+├── setup/              # Test utilities, MSW handlers, configuration
+├── fixtures/           # Mock data and test scenarios
+├── hooks/              # Hook unit tests (useImageSearch, useApiKey, etc.)
+├── lib/                # Service layer tests (cache, SERPAPI, API key management)
+└── pages/api/          # API route tests (/api/scraper, /api/usage)
+```
+
+### Testing Guidelines
+
+**Hook Testing**:
+- Test core user workflows: image search, API key management, search history
+- Use `renderHook` from React Testing Library for isolated hook testing
+- Mock external dependencies (SERPAPI, localStorage) appropriately
+- Test both success and error scenarios with realistic Korean food keywords
+
+**Service Testing**:
+- Test business logic in isolation from UI components
+- Use MSW to mock SERPAPI responses with realistic data
+- Test caching behavior, TTL expiration, and memory management
+- Validate error handling and pattern matching in `SERPAPI_ERROR_MAP`
+
+**API Route Testing**:
+- Test `/api/scraper` endpoint with multi-keyword requests
+- Test `/api/usage` endpoint for API key monitoring
+- Mock Next.js request/response objects appropriately
+- Validate error responses and status codes
+
+**Integration Testing**:
+- Test complete user workflows end-to-end
+- Test API key fallback scenarios (user → environment keys)
+- Test search history persistence and retrieval
+- Test image selection and result caching
+
+### Test Data Strategy
+- Use realistic Korean food keywords (삼계탕, 김치찌개, 된장찌개) in test scenarios
+- Mock SERPAPI responses with authentic image URLs and metadata
+- Test with various API key states: valid, exhausted, invalid, missing
+- Include edge cases: rate limiting, network errors, malformed responses
+
+### Coverage Requirements
+- **Critical Paths**: 100% coverage required for API key management and search functionality
+- **Overall Target**: 90%+ statements, 85%+ branches, 95%+ functions
+- **Focus Areas**: Core user workflows, error handling, caching system
+- **Exclusions**: Next.js generated files, third-party integrations
+
+### Running Tests
+```bash
+# Development testing
+pnpm test:watch         # Watch mode for development
+pnpm test -- hooks/     # Run specific test directory
+pnpm test:coverage      # Generate coverage report
+
+# CI/CD testing
+pnpm test:ci           # Full test suite for CI
+pnpm test:coverage:ci  # Coverage for CI reporting
+```
+
+### Mock Strategy
+- **SERPAPI Mocking**: Use MSW to intercept and mock API requests with realistic responses
+- **LocalStorage Mocking**: Mock browser APIs for consistent testing across environments
+- **Time Mocking**: Mock Date and setTimeout for cache TTL testing
+- **Error Simulation**: Mock various SERPAPI error scenarios (quota exceeded, invalid keys)
+
+### Quality Gates
+- All new features must include corresponding unit tests
+- No failing tests allowed in main branch
+- Minimum 85% coverage for modified files
+- Tests must be readable and follow AAA pattern (Arrange, Act, Assert)

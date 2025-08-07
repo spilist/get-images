@@ -139,6 +139,12 @@ pnpm start
 
 # Code linting
 pnpm lint
+
+# Testing
+pnpm test          # Run all tests
+pnpm test:watch    # Run tests in watch mode
+pnpm test:coverage # Run tests with coverage report
+pnpm test:ci       # Run tests for CI
 ```
 
 ### Project Structure
@@ -157,6 +163,11 @@ get-images/
 │   ├── hooks/               # React hooks with centralized logic
 │   │   └── use-image-search.ts # Centralized API key handling
 │   └── types/               # TypeScript definitions
+├── __tests__/               # Comprehensive test suite
+│   ├── hooks/              # Hook unit tests
+│   ├── lib/                # Service layer tests  
+│   ├── pages/api/          # API route tests
+│   └── setup/              # Test utilities and configuration
 ├── scripts/
 │   └── scraper.py          # CLI script (DuckDuckGo)
 └── requirements.txt        # Python dependencies
@@ -178,6 +189,61 @@ get-images/
 - Usage-based validation prioritizes functional keys
 - Automatic exclusion of exhausted keys
 - Real-time monitoring of key status and quotas
+
+---
+
+## 🧪 Testing
+
+GetImages includes a comprehensive testing infrastructure built with **Jest**, **React Testing Library**, and **MSW** for reliable code quality and user workflow validation.
+
+### Testing Framework
+- **Jest 30+** with Next.js 15 and TypeScript support
+- **React Testing Library** for component and hook testing
+- **MSW (Mock Service Worker)** for SERPAPI response mocking
+- **140+ test cases** covering critical user workflows
+
+### Running Tests
+
+```bash
+# Run all tests
+pnpm test
+
+# Run tests in watch mode (development)
+pnpm test:watch
+
+# Generate coverage report
+pnpm test:coverage
+
+# Run tests for CI/CD
+pnpm test:ci
+```
+
+### Test Coverage
+
+| Component | Coverage Focus |
+|-----------|----------------|
+| **Hook Tests** | Image search, API key management, search history |
+| **Service Tests** | SERPAPI integration, caching, error handling |
+| **API Tests** | Search endpoints, usage monitoring |
+| **Integration Tests** | End-to-end user workflows |
+
+### Test Architecture
+
+```
+__tests__/
+├── hooks/          # Core functionality testing
+├── lib/            # Service layer validation  
+├── pages/api/      # API endpoint testing
+├── setup/          # Test utilities and MSW configuration
+└── fixtures/       # Mock data and realistic test scenarios
+```
+
+### Key Testing Features
+- **Realistic Data**: Uses Korean food keywords (삼계탕, 김치찌개) for authentic testing
+- **API Mocking**: Complete SERPAPI response simulation with MSW
+- **Error Scenarios**: Tests API exhaustion, rate limiting, and invalid keys
+- **TypeScript Safety**: Full type checking in all test files
+- **CI Integration**: Automated testing with coverage reporting
 
 ---
 
