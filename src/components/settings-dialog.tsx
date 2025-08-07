@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Eye, EyeOff, Settings, ExternalLink, Key, Trash2, Save, AlertCircle, CheckCircle2 } from "lucide-react";
 import {
   Dialog,
@@ -33,6 +33,7 @@ import {
   storeSearchFilters,
 } from "@/lib/api-key-storage";
 import type { SearchFilters, LicenseType, AspectRatio, ImageSize, ImageType } from '@/lib/serpapi.service';
+import type { ApiKeyUsage } from '@/lib/api-key-usage';
 import languages from '@/../references/google-languages.json';
 import { ApiKeyConfig } from "@/types/api";
 
@@ -53,6 +54,28 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
   // Search filters state
   const [searchFilters, setSearchFilters] = useState<SearchFilters>({});
   const [startDate, setStartDate] = useState<Date>();
+  
+  // API usage monitoring state
+  const [apiUsages, setApiUsages] = useState<(ApiKeyUsage & { keyType: string })[]>([]);
+  const [usageLoading, setUsageLoading] = useState(false);
+
+  // Function to fetch API usage
+  const fetchApiUsage = useCallback(async () => {
+    setUsageLoading(true);
+    try {
+      const response = await fetch('/api/usage', {
+        headers: currentConfig?.source === 'user' ? { 'X-API-Key': currentConfig.apiKey } : {}
+      });
+      const data = await response.json();
+      if (data.success) {
+        setApiUsages(data.usages);
+      }
+    } catch (error) {
+      console.error('Failed to fetch API usage:', error);
+    } finally {
+      setUsageLoading(false);
+    }
+  }, [currentConfig?.source, currentConfig?.apiKey]);
 
   // Load current configuration when dialog opens
   useEffect(() => {
@@ -82,8 +105,11 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
       
       setError(null);
       setSuccess(null);
+      
+      // Fetch API usage information
+      fetchApiUsage();
     }
-  }, [isOpen]);
+  }, [isOpen, fetchApiUsage]);
 
   const handleSave = async () => {
     setIsLoading(true);
@@ -349,8 +375,78 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
               </AlertDescription>
             </Alert>
           )}
+          </div>
 
+          <Separator />
 
+          {/* API Usage Section */}
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <Key className="h-4 w-4" />
+                <h3 className="text-lg font-semibold">API Key Usage</h3>
+              </div>
+              <Button variant="outline" size="sm" onClick={fetchApiUsage} disabled={usageLoading}>
+                {usageLoading ? "Loading..." : "Refresh"}
+              </Button>
+            </div>
+
+            {usageLoading ? (
+              <div className="text-center py-4 text-muted-foreground">
+                Loading API usage information...
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {apiUsages.length > 0 ? (
+                  apiUsages.map((usage, index) => (
+                    <div key={index} className="p-4 rounded-lg border bg-card">
+                      <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                          <Badge variant={usage.keyType === 'user' ? 'default' : 'secondary'}>
+                            {usage.keyType === 'user' ? 'Your Key' : 'Environment Key'} {usage.apiKey}
+                          </Badge>
+                          {usage.isExhausted && (
+                            <Badge variant="destructive">Exhausted</Badge>
+                          )}
+                          {usage.error && (
+                            <Badge variant="outline" className="text-yellow-600">Error</Badge>
+                          )}
+                        </div>
+                      </div>
+                      
+                      {usage.error ? (
+                        <div className="text-sm text-muted-foreground">
+                          Error: {usage.error}
+                        </div>
+                      ) : (
+                        <div className="flex justify-between items-center">
+                          <div className="flex-1">
+                            <div className="text-sm text-muted-foreground mb-1">Monthly Searches Left</div>
+                            <div className={`text-2xl font-bold ${usage.planSearchesLeft === 0 ? 'text-red-500' : usage.planSearchesLeft < 100 ? 'text-yellow-500' : 'text-green-500'}`}>
+                              {usage.planSearchesLeft.toLocaleString()}
+                            </div>
+                          </div>
+                          <div className="flex-1 text-right">
+                            <div className="text-sm text-muted-foreground mb-1">Used This Month</div>
+                            <div className="text-xl font-semibold text-muted-foreground">
+                              {usage.thisMonthUsage.toLocaleString()}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                      
+                      <div className="text-xs text-muted-foreground mt-2">
+                        Last checked: {new Date(usage.lastChecked).toLocaleString()}
+                      </div>
+                    </div>
+                  ))
+                ) : (
+                  <div className="text-center py-4 text-muted-foreground">
+                    No API keys configured or unable to fetch usage information.
+                  </div>
+                )}
+              </div>
+            )}
           </div>
 
           <Separator />

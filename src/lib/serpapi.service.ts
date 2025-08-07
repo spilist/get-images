@@ -1,5 +1,6 @@
 import { getJson } from 'serpapi'
 import { InMemoryCache, simpleHash } from '@/lib/cache'
+import { getValidApiKey } from '@/lib/api-key-usage'
 
 interface ImageResult {
   url: string
@@ -70,7 +71,14 @@ const searchCache = new InMemoryCache<SearchResult>({
   cleanupInterval: 60 * 60 * 1000 // 1 hour cleanup interval
 });
 
-function getEnvironmentApiKey(): string | undefined {
+async function getEnvironmentApiKey(): Promise<string | undefined> {
+  // Try to get a valid (non-exhausted) API key
+  const validApiKey = await getValidApiKey()
+  if (validApiKey) {
+    return validApiKey
+  }
+  
+  // Fallback to old rotation logic if usage checking fails
   const key1 = process.env.SERPAPI_KEY;
   const key2 = process.env.SERPAPI_KEY2;
   
@@ -145,7 +153,7 @@ function parseSerpAPIError(errorMessage: string, userApiKey?: string): string {
 
 async function searchImagesWithSerpAPI(query: string, maxResults: number = 3, userApiKey?: string, filters?: SearchFilters): Promise<SearchResult> {
   // Use user-provided API key if available, otherwise fall back to environment keys with rotation
-  const apiKey = userApiKey || getEnvironmentApiKey()
+  const apiKey = userApiKey || await getEnvironmentApiKey()
   
   if (!apiKey) {
     return {

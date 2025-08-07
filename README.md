@@ -12,6 +12,7 @@ A modern, intelligent web application for searching and collecting images from m
 - **Multi-keyword Search**: Search multiple terms simultaneously
 - **Dual API Support**: Web interface (SERPAPI) + CLI tool (DuckDuckGo)  
 - **Smart Caching**: 24-hour cache system reduces costs and improves speed
+- **API Usage Monitoring**: Real-time tracking with automatic exhausted key exclusion
 - **Flexible API Keys**: Use default keys or configure your own
 - **Responsive Design**: Optimized for desktop and mobile
 - **Export Functionality**: Easy copy/export of results
@@ -63,6 +64,23 @@ python scripts/scraper.py
    ```
 
 **API Key Rotation**: Configure multiple keys for automatic load balancing and rate limit distribution.
+
+### API Key Usage Monitoring
+
+GetImages automatically monitors your API key usage and intelligently manages key rotation:
+
+| Feature | Benefit |
+|---------|---------|
+| **Real-time Usage Tracking** | Monitor monthly searches left, usage, and limits |
+| **Automatic Key Exclusion** | Exhausted keys are automatically skipped |
+| **Smart Rotation** | Only uses keys with remaining credits |
+| **Usage Dashboard** | View detailed usage statistics in Settings |
+
+**How it works**:
+- Checks SERPAPI account status every 5 minutes
+- Automatically excludes keys with 0 searches remaining
+- Displays usage information in Settings → API Key Usage
+- Prevents failed requests from exhausted keys
 
 ### Search Engine Options
 
