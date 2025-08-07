@@ -21,10 +21,7 @@ export default function Home() {
   
   // Search history integration
   const handleRerunSearch = async (keywords: string[], searchFilters?: import('@/lib/serpapi.service').SearchFilters) => {
-    const apiKey = apiKeyConfig?.source === 'user' && apiKeyConfig.isValid && apiKeyConfig.apiKey 
-      ? apiKeyConfig.apiKey 
-      : undefined;
-    await search(keywords, apiKey, searchFilters);
+    await search(keywords, apiKeyConfig, searchFilters);
   };
   
   const { history, addToHistory, removeFromHistory, clearHistory, rerunSearch } = useSearchHistory(handleRerunSearch);
@@ -37,12 +34,8 @@ export default function Home() {
   const { isVisible: isDemoNoticeVisible, closeDemoNotice } = useDemoNotice();
 
   const handleSearch = async (keywords: string[]) => {
-    const apiKey = apiKeyConfig?.source === 'user' && apiKeyConfig.isValid && apiKeyConfig.apiKey 
-      ? apiKeyConfig.apiKey 
-      : undefined;
-    
     const searchFilters = getStoredSearchFilters();
-    await search(keywords, apiKey, searchFilters || undefined);
+    await search(keywords, apiKeyConfig, searchFilters || undefined);
   };
 
   const copyResults = async () => {

@@ -353,7 +353,7 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
               <p className="text-sm">2. Sign up or log in to your account</p>
               <p className="text-sm">3. Copy your API key and paste it above</p>
               <p className="text-xs text-muted-foreground mt-2">
-                Your API key is stored locally and never sent to our servers.
+                Your API key is stored locally in your browser&apos;s `localStorage`. While convenient, this can be vulnerable to cross-site scripting (XSS) attacks on compromised websites. Never share your browser session or use this feature on untrusted computers.
               </p>
             </AlertDescription>
           </Alert>

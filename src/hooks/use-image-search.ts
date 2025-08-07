@@ -1,5 +1,5 @@
 import { useState, useCallback } from "react";
-import { MultipleKeywordsResponse } from "@/types/api";
+import { MultipleKeywordsResponse, ApiKeyConfig } from "@/types/api";
 import { SearchFilters } from "@/lib/serpapi.service";
 
 interface UseImageSearchState {
@@ -9,7 +9,7 @@ interface UseImageSearchState {
 }
 
 interface UseImageSearchReturn extends UseImageSearchState {
-  search: (keywords: string[], apiKey?: string, searchFilters?: SearchFilters) => Promise<void>;
+  search: (keywords: string[], apiKeyConfig: ApiKeyConfig | null, searchFilters?: SearchFilters) => Promise<void>;
   runSampleSearch: () => Promise<void>;
   clearResults: () => void;
   currentSearchFilters: SearchFilters | null;
@@ -85,7 +85,7 @@ export function useImageSearch(): UseImageSearchReturn {
     };
   };
 
-  const search = useCallback(async (keywords: string[], apiKey?: string, searchFilters?: SearchFilters) => {
+  const search = useCallback(async (keywords: string[], apiKeyConfig: ApiKeyConfig | null, searchFilters?: SearchFilters) => {
     if (keywords.length === 0) {
       setState(prev => ({ ...prev, error: "Please enter at least one keyword" }));
       return;
@@ -110,6 +110,8 @@ export function useImageSearch(): UseImageSearchReturn {
         max_results_per_keyword: 5
       };
 
+      // Determine which API key to use based on config
+      const apiKey = apiKeyConfig?.source === 'user' && apiKeyConfig.isValid ? apiKeyConfig.apiKey : undefined;
       if (apiKey) {
         requestBody.api_key = apiKey;
       }

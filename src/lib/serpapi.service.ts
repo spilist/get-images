@@ -62,7 +62,7 @@ interface SerpAPIResponse {
 }
 
 // Simple counter for API key rotation
-let apiKeyRotationCounter = 0;
+
 
 // Initialize cache for search results
 const searchCache = new InMemoryCache<SearchResult>({
@@ -71,83 +71,69 @@ const searchCache = new InMemoryCache<SearchResult>({
   cleanupInterval: 60 * 60 * 1000 // 1 hour cleanup interval
 });
 
+// Error pattern mapping for consistent and maintainable error handling
+const SERPAPI_ERROR_MAP = [
+  {
+    patterns: ["hasn't returned any results for this query", "no results found", "fully empty"],
+    message: () => 'No images found with the current filters. Try removing some filters (like image type, license, or date restrictions) to get more results.'
+  },
+  {
+    patterns: ["invalid api key", "unauthorized"],
+    message: (userApiKey?: string) => userApiKey 
+      ? 'Invalid API key provided. Please check your API key in Settings and ensure it\'s correct. You can get a valid API key from https://serpapi.com/manage-api-key'
+      : 'Demo API key is invalid or expired. Please open Settings and provide your own SERPAPI key from https://serpapi.com/manage-api-key'
+  },
+  {
+    patterns: ["run out of searches", "account has run out"],
+    message: (userApiKey?: string) => userApiKey
+      ? 'Your API key has run out of searches. Please check your SERPAPI account or upgrade your plan at https://serpapi.com/manage-api-key'
+      : 'Demo account has run out of searches. Please open Settings and provide your own SERPAPI key to continue using the service.'
+  },
+  {
+    patterns: ["too many requests", "rate limit", "exceeded hourly limit"],
+    message: (userApiKey?: string) => userApiKey
+      ? 'Rate limit exceeded for your API key. Please wait a moment and try again, or consider upgrading your SERPAPI plan.'
+      : 'Demo service rate limit exceeded. Please open Settings and provide your own SERPAPI key for unlimited access.'
+  },
+  {
+    patterns: ["missing", "parameter"],
+    message: () => 'Search request is missing required parameters. Please try again with a valid search query.'
+  },
+  {
+    patterns: ["forbidden"],
+    message: () => 'Access forbidden. Your API key may not have permission for this type of search. Please check your SERPAPI account settings.'
+  },
+  {
+    patterns: ["not found", "404"],
+    message: () => 'Search resource not found. Please try a different search query.'
+  },
+  {
+    patterns: ["server error", "503", "500"],
+    message: () => 'SERPAPI server is temporarily unavailable. Please try again in a few moments.'
+  }
+];
+
 async function getEnvironmentApiKey(): Promise<string | undefined> {
-  // Try to get a valid (non-exhausted) API key
-  const validApiKey = await getValidApiKey()
-  if (validApiKey) {
-    return validApiKey
-  }
-  
-  // Fallback to old rotation logic if usage checking fails
-  const key1 = process.env.SERPAPI_KEY;
-  const key2 = process.env.SERPAPI_KEY2;
-  
-  // If both keys are available, rotate between them
-  if (key1 && key2) {
-    apiKeyRotationCounter = (apiKeyRotationCounter + 1) % 2;
-    return apiKeyRotationCounter === 0 ? key1 : key2;
-  }
-  
-  // Otherwise, return whichever key is available
-  return key1 || key2;
+  const validApiKey = await getValidApiKey();
+  return validApiKey || process.env.SERPAPI_KEY || undefined;
 }
 
 function parseSerpAPIError(errorMessage: string, userApiKey?: string): string {
-  const lowerError = errorMessage.toLowerCase()
+  const lowerError = errorMessage.toLowerCase();
   
-  // Check for empty results due to strict filters
-  if (lowerError.includes("hasn't returned any results for this query") || 
-      lowerError.includes("no results found") ||
-      lowerError.includes("fully empty")) {
-    return 'No images found with the current filters. Try removing some filters (like image type, license, or date restrictions) to get more results.'
-  }
-  
-  // Check for specific SERPAPI error patterns
-  if (lowerError.includes('invalid api key') || lowerError.includes('unauthorized')) {
-    if (userApiKey) {
-      return 'Invalid API key provided. Please check your API key in Settings and ensure it\'s correct. You can get a valid API key from https://serpapi.com/manage-api-key'
-    } else {
-      return 'Demo API key is invalid or expired. Please open Settings and provide your own SERPAPI key from https://serpapi.com/manage-api-key'
+  // Find matching error pattern
+  for (const errorItem of SERPAPI_ERROR_MAP) {
+    const hasMatch = errorItem.patterns.some(pattern => lowerError.includes(pattern));
+    if (hasMatch) {
+      return errorItem.message(userApiKey);
     }
-  }
-  
-  if (lowerError.includes('run out of searches') || lowerError.includes('account has run out')) {
-    if (userApiKey) {
-      return 'Your API key has run out of searches. Please check your SERPAPI account or upgrade your plan at https://serpapi.com/manage-api-key'
-    } else {
-      return 'Demo account has run out of searches. Please open Settings and provide your own SERPAPI key to continue using the service.'
-    }
-  }
-  
-  if (lowerError.includes('too many requests') || lowerError.includes('rate limit') || lowerError.includes('exceeded hourly limit')) {
-    if (userApiKey) {
-      return 'Rate limit exceeded for your API key. Please wait a moment and try again, or consider upgrading your SERPAPI plan.'
-    } else {
-      return 'Demo service rate limit exceeded. Please open Settings and provide your own SERPAPI key for unlimited access.'
-    }
-  }
-  
-  if (lowerError.includes('missing') && lowerError.includes('parameter')) {
-    return 'Search request is missing required parameters. Please try again with a valid search query.'
-  }
-  
-  if (lowerError.includes('forbidden')) {
-    return 'Access forbidden. Your API key may not have permission for this type of search. Please check your SERPAPI account settings.'
-  }
-  
-  if (lowerError.includes('not found') || lowerError.includes('404')) {
-    return 'Search resource not found. Please try a different search query.'
-  }
-  
-  if (lowerError.includes('server error') || lowerError.includes('503') || lowerError.includes('500')) {
-    return 'SERPAPI server is temporarily unavailable. Please try again in a few moments.'
   }
   
   // Default fallback error message
   if (userApiKey) {
-    return `${errorMessage} Please try again or check your API key in Settings.`
+    return `${errorMessage} Please try again or check your API key in Settings.`;
   } else {
-    return `${errorMessage} For reliable access, please provide your own SERPAPI key in Settings.`
+    return `${errorMessage} For reliable access, please provide your own SERPAPI key in Settings.`;
   }
 }
 
