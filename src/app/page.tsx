@@ -55,14 +55,14 @@ export default function Home() {
               <div className="flex-1 text-left">
                 <h1 className="text-xl sm:text-3xl font-bold mb-1 sm:mb-2">GetImages</h1>
                 <p className="text-xs sm:text-sm text-muted-foreground hidden sm:block mb-3">
-                  Search for images using multiple keywords and create your curated list
+                  Search for images using multiple keywords and create your curated list. <br />Feel free to <a href="https://github.com/spilist/get-images/issues" target="_blank" className="text-primary hover:underline">open an issue</a> if you have any questions or suggestions.
                 </p>
               </div>
               <div className="flex items-center gap-3">
                 {/* Creator info - hidden on mobile, shown on larger screens */}
                 <div className="hidden lg:flex items-center gap-3 text-xs text-muted-foreground">
                   <span>
-                    Created by <a href="https://stdy.blog" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">배휘동</a>
+                    Created by <a href="https://stdy.blog" target="_blank" className="text-primary hover:underline">배휘동</a>
                   </span>
                   <a 
                     href="https://github.com/spilist/get-images" 
@@ -77,7 +77,6 @@ export default function Home() {
                   <a 
                     href="https://coff.ee/steady.study.dev" 
                     target="_blank" 
-                    rel="noopener noreferrer"
                     className="flex items-center gap-1 text-primary hover:underline transition-colors"
                   >
                     <Coffee className="h-3 w-3" />

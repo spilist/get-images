@@ -49,7 +49,7 @@ export function SearchHistoryTrigger({
         </Button>
       </DialogTrigger>
       
-      <DialogContent className="max-w-4xl w-[90vw]">
+      <DialogContent className="max-w-4xl w-[90vw] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>Search History</DialogTitle>
         </DialogHeader>

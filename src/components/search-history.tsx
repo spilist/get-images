@@ -77,7 +77,7 @@ export function SearchHistory({
   }
 
   return (
-    <div className="max-h-[60vh] overflow-y-auto">
+    <div>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
           <span>{history.length} item{history.length !== 1 ? 's' : ''}</span>
@@ -87,7 +87,7 @@ export function SearchHistory({
             variant="ghost"
             size="sm"
             onClick={onClearHistory}
-            className="text-xs"
+            className="text-xs sm:text-sm h-9 sm:h-8"
           >
             <Trash2 className="h-3 w-3 mr-1" />
             Clear All
@@ -181,7 +181,7 @@ export function SearchHistory({
                     size="sm"
                     onClick={() => handleCopyResults(entry)}
                     disabled={selectedImageCount === 0}
-                    className="text-xs"
+                    className="text-xs sm:text-sm h-9 sm:h-8"
                   >
                     {isCopying ? (
                       <CheckCircle2 className="h-3 w-3 mr-1" />
@@ -195,7 +195,7 @@ export function SearchHistory({
                     size="sm"
                     onClick={() => handleRerunSearch(entry)}
                     disabled={isLoading}
-                    className="text-xs"
+                    className="text-xs sm:text-sm h-9 sm:h-8"
                   >
                     <Search className="h-3 w-3 mr-1" />
                     {isLoading ? 'Searching...' : 'Search Again'}

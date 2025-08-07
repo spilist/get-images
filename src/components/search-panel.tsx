@@ -71,6 +71,9 @@ export function SearchPanel({
 
   const hasUserKey = apiKeyConfig?.source === 'user';
 
+  // Shared button styles for consistency and easier maintenance
+  const buttonBaseClasses = "flex-1 sm:flex-none sm:w-32 h-10 sm:h-9 text-sm";
+
   return (
     <div className="space-y-4">
       {/* Keywords input */}
@@ -132,8 +135,7 @@ export function SearchPanel({
         <Button 
           onClick={handleSearch} 
           disabled={isLoading}
-          className="flex-1 sm:flex-none sm:w-32"
-          size="sm"
+          className={buttonBaseClasses}
         >
           {isLoading ? "Searching..." : "Search Images"}
         </Button>
@@ -141,17 +143,15 @@ export function SearchPanel({
           onClick={handleSample} 
           disabled={isLoading}
           variant="outline"
-          className="flex-1 sm:flex-none sm:w-32"
-          size="sm"
+          className={buttonBaseClasses}
         >
           {isLoading ? "Loading..." : "Examples"}
         </Button>
         {selectedImageCount > 0 && (
           <Button
-            size="sm"
             variant={copyStatus === "success" ? "default" : "outline"}
             onClick={handleCopy}
-            className="flex items-center justify-center gap-2 flex-1 sm:flex-none sm:w-32"
+            className={`${buttonBaseClasses} flex items-center justify-center gap-2`}
           >
             {copyStatus === "success" ? (
               <CheckCircle2 className="h-4 w-4" />
