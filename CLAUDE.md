@@ -125,6 +125,24 @@ Vercel deployment ready with environment variable support for `SERPAPI_KEY`.
 
 - All buttons should have `cursor: pointer`
 
+## Documentation Maintenance
+
+This project maintains documentation in both English and Korean:
+- **English**: `README.md` - Primary documentation
+- **Korean**: `README.ko.md` - Korean translation
+
+**Important**: When updating documentation, you MUST update BOTH files to maintain consistency:
+1. Update the English `README.md` first
+2. Apply equivalent changes to the Korean `README.ko.md`
+3. Ensure section structure and content parity between both versions
+4. Maintain consistent formatting and styling across languages
+
+**Translation Guidelines**:
+- Technical terms may remain in English when commonly used (e.g., API, CLI, TypeScript)
+- Code examples and commands should remain identical in both versions
+- Links to external resources should use the same URLs unless Korean-specific alternatives exist
+- Environment variable names and configuration examples must be identical
+
 ## Development Guidelines
 
 ### Code Architecture

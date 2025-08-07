@@ -63,6 +63,30 @@ python scripts/scraper.py
    SERPAPI_KEY2=your_secondary_key_here  # 선택사항: 자동 로테이션 활성화
    ```
 
+### 웹 분석 설정 (선택사항)
+
+GetImages는 사용자 행동 추적을 위한 웹 분석 통합을 지원합니다:
+
+```bash
+# Google Analytics
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX  # Google Analytics 4 측정 ID
+
+# Microsoft Clarity
+NEXT_PUBLIC_CLARITY_PROJECT_ID=xxxxxxxxx  # Clarity 프로젝트 ID
+```
+
+**분석 기능**:
+- **Google Analytics 4**: 페이지 조회, 사용자 참여도, 전환 추적
+- **Microsoft Clarity**: 히트맵, 세션 녹화, 사용자 행동 인사이트
+- **프라이버시 친화적**: 환경 변수가 설정된 경우에만 로드
+- **프로덕션 준비**: Next.js Script 컴포넌트를 사용한 최적화된 로딩 전략
+
+**설정 방법**:
+1. **Google Analytics**: [Google Analytics](https://analytics.google.com/)에서 측정 ID 확인
+2. **Microsoft Clarity**: [Clarity 대시보드](https://clarity.microsoft.com/)에서 프로젝트 ID 확인
+3. `.env.local` 파일에 각각의 환경 변수 추가
+4. 설정이 완료되면 분석이 자동으로 추적을 시작합니다
+
 **API 키 로테이션**: 여러 키를 설정하여 자동 로드 밸런싱 및 속도 제한 분산이 가능합니다.
 
 #### 🔐 API 키 보안
@@ -289,6 +313,8 @@ const response = await fetch('/api/scraper', {
 2. 환경 변수 설정:
    - `SERPAPI_KEY`: 기본 SERPAPI 키
    - `SERPAPI_KEY2`: 선택적 보조 키
+   - `NEXT_PUBLIC_GA_ID`: 선택적 Google Analytics 추적 ID
+   - `NEXT_PUBLIC_CLARITY_PROJECT_ID`: 선택적 Microsoft Clarity 프로젝트 ID
 3. 푸시 시 자동 배포
 
 ### 다른 플랫폼

@@ -63,6 +63,30 @@ python scripts/scraper.py
    SERPAPI_KEY2=your_secondary_key_here  # Optional: enables auto-rotation
    ```
 
+### Analytics Configuration (Optional)
+
+GetImages supports web analytics integration for user behavior tracking:
+
+```bash
+# Google Analytics
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX  # Your Google Analytics 4 Measurement ID
+
+# Microsoft Clarity
+NEXT_PUBLIC_CLARITY_PROJECT_ID=xxxxxxxxx  # Your Clarity Project ID
+```
+
+**Analytics Features**:
+- **Google Analytics 4**: Page views, user engagement, and conversion tracking
+- **Microsoft Clarity**: Heatmaps, session recordings, and user behavior insights
+- **Privacy-Friendly**: Only loads when environment variables are configured
+- **Production-Ready**: Optimized loading strategies using Next.js Script component
+
+**Setup Instructions**:
+1. **Google Analytics**: Get your Measurement ID from [Google Analytics](https://analytics.google.com/)
+2. **Microsoft Clarity**: Get your Project ID from [Clarity Dashboard](https://clarity.microsoft.com/)
+3. Add the respective environment variables to your `.env.local` file
+4. Analytics will automatically start tracking once configured
+
 **API Key Rotation**: Configure multiple keys for automatic load balancing and rate limit distribution.
 
 #### 🔐 API Key Security
@@ -289,6 +313,8 @@ const response = await fetch('/api/scraper', {
 2. Set environment variables:
    - `SERPAPI_KEY`: Your default SERPAPI key
    - `SERPAPI_KEY2`: Optional secondary key
+   - `NEXT_PUBLIC_GA_ID`: Optional Google Analytics tracking ID
+   - `NEXT_PUBLIC_CLARITY_PROJECT_ID`: Optional Microsoft Clarity project ID
 3. Deploy automatically on push
 
 ### Other Platforms
