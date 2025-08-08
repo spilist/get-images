@@ -80,7 +80,7 @@ export function getAspectLabel(aspect: AspectRatio): string {
 }
 
 export function getSizeLabel(size: ImageSize): string {
-  return SIZE_LABELS[size] || size;
+  return SIZE_LABELS[size as keyof typeof SIZE_LABELS] || size;
 }
 
 export function getTypeLabel(type: ImageType): string {

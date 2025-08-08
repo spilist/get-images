@@ -36,7 +36,9 @@
       "mcp__serena__insert_before_symbol",
       "mcp__serena__think_about_collected_information",
       "mcp__serena__switch_modes",
-      "mcp__serena__summarize_changes"
+      "mcp__serena__summarize_changes",
+      "Bash(cp:*)",
+      "Bash(find:*)"
     ],
     "deny": []
   }

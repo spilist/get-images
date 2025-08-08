@@ -1,0 +1,120 @@
+{
+  "title": "Settings",
+  "apiKey": {
+    "title": "API Key",
+    "label": "SERPAPI Key",
+    "placeholder": "Enter your SERPAPI key",
+    "save": "Save Key",
+    "clear": "Clear Key",
+    "show": "Show",
+    "hide": "Hide",
+    "getKey": "Get SERPAPI Key",
+    "usage": "API Key Usage",
+    "monthlySearchesLeft": "Monthly Searches Left",
+    "exhausted": "Exhausted",
+    "validationError": "Please enter an API key",
+    "formatError": "Invalid API key format",
+    "saveSuccess": "API key saved successfully!",
+    "saveError": "Failed to save API key",
+    "clearSuccess": "API key cleared successfully!",
+    "clearError": "Failed to clear API key",
+    "xssWarning": "⚠️ Storing API keys in browser storage has XSS risks. Consider using environment variables for production."
+  },
+  "searchOptions": {
+    "title": "Search Options",
+    "saveOptions": "Save Options",
+    "resetOptions": "Reset Options",
+    "saveSuccess": "Search options saved successfully!",
+    "saveError": "Failed to save search options.",
+    "resetSuccess": "Search options reset to default.",
+    "engine": {
+      "label": "Search Engine",
+      "placeholder": "Select search engine",
+      "googleImages": "Google Images (Full)",
+      "googleImagesDescription": "Slower but full resolution images",
+      "googleImagesLight": "Google Images Light (Fast)",
+      "googleImagesLightDescription": "Faster but thumbnail images only"
+    },
+    "licenses": {
+      "label": "Licenses",
+      "placeholder": "Select license type",
+      "options": {
+        "all": "All licenses",
+        "f": "Free to use or share",
+        "fc": "Free to use or share, commercially",
+        "fm": "Free to use, share or modify",
+        "fmc": "Free to use, share or modify, commercially",
+        "cl": "Creative Commons licenses",
+        "ol": "Commercial and other licenses"
+      }
+    },
+    "language": {
+      "label": "Language",
+      "placeholder": "Select language"
+    },
+    "startDate": {
+      "label": "Start Date"
+    },
+    "aspect": {
+      "label": "Aspect Ratio",
+      "placeholder": "Select aspect ratio",
+      "face": "Face",
+      "any": "Any",
+      "tall": "Tall",
+      "square": "Square",
+      "wide": "Wide",
+      "panoramic": "Panoramic"
+    },
+    "size": {
+      "label": "Image Size",
+      "placeholder": "Select size",
+      "any": "Any size",
+      "large": "Large",
+      "medium": "Medium",
+      "small": "Small",
+      "icon": "Icon"
+    },
+    "type": {
+      "label": "Image Type",
+      "placeholder": "Select type",
+      "any": "Any type",
+      "photo": "Photo",
+      "clipart": "Clip Art",
+      "lineart": "Line Drawing",
+      "animated": "Animated"
+    },
+    "safeSearch": {
+      "label": "Safe Search",
+      "description": "Enable safe search filter"
+    }
+  },
+  "interface": {
+    "title": "Interface",
+    "language": {
+      "label": "Display Language",
+      "english": "English",
+      "korean": "한국어"
+    }
+  },
+  "instructions": {
+    "description": "Configure your SERPAPI key and search options.",
+    "steps": {
+      "visitSerpapi": "1. Visit <serpapiLink>serpapi.com/manage-api-key</serpapiLink> to get your API key",
+      "signUp": "2. Sign up or log in to your account",
+      "copyKey": "3. Copy your API key and paste it above"
+    }
+  },
+  "status": {
+    "currentStatus": "Current Status:",
+    "environmentKey": "Environment Key",
+    "userKey": "User Key",
+    "yourKey": "Your Key"
+  },
+  "usage": {
+    "usedThisMonth": "Used This Month",
+    "lastChecked": "Last checked"
+  },
+  "datePicker": {
+    "placeholder": "Pick a date"
+  }
+}

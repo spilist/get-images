@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SearchHistoryEntry } from '@/types/api';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -18,6 +19,7 @@ export function SearchHistoryTrigger({
   onRemoveEntry, 
   onClearHistory 
 }: SearchHistoryTriggerProps) {
+  const { t } = useTranslation(['search']);
   const [open, setOpen] = useState(false);
 
   const handleRerunSearch = async (entry: SearchHistoryEntry) => {
@@ -32,26 +34,26 @@ export function SearchHistoryTrigger({
           variant="ghost" 
           size="sm" 
           className="h-8 px-2 relative"
-          title="Search History"
+          title={t('search:searchHistory')}
         >
           <Clock className="h-4 w-4" />
           {history.length > 0 && (
             <>
-              <span className="ml-1 text-xs hidden sm:inline">History</span>
+              <span className="ml-1 text-xs hidden sm:inline">{t('search:searchHistory')}</span>
               <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-xs rounded-full h-4 w-4 flex items-center justify-center min-w-4">
                 {history.length > 9 ? '9+' : history.length}
               </span>
             </>
           )}
           {history.length === 0 && (
-            <span className="ml-1 text-xs hidden sm:inline">History</span>
+            <span className="ml-1 text-xs hidden sm:inline">{t('search:searchHistory')}</span>
           )}
         </Button>
       </DialogTrigger>
       
       <DialogContent className="max-w-4xl w-[90vw] max-h-[80vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Search History</DialogTitle>
+          <DialogTitle>{t('search:searchHistory')}</DialogTitle>
         </DialogHeader>
         <SearchHistory
           history={history}

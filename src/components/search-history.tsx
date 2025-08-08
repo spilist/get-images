@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { SearchHistoryEntry } from '@/types/api';
 import { Button } from '@/components/ui/button';
 
@@ -27,6 +28,7 @@ export function SearchHistory({
   onRemoveEntry, 
   onClearHistory 
 }: SearchHistoryProps) {
+  const { t } = useTranslation(['common', 'search']);
   const [loadingEntryId, setLoadingEntryId] = useState<string | null>(null);
   const [copyingEntryId, setCopyingEntryId] = useState<string | null>(null);
 
@@ -68,9 +70,9 @@ export function SearchHistory({
     return (
       <div className="p-8 text-center">
         <Clock className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-        <h3 className="text-lg font-medium mb-2">No Search History</h3>
+        <h3 className="text-lg font-medium mb-2">{t('common:noDataTitle')}</h3>
         <p className="text-sm text-muted-foreground">
-          Your recent searches will appear here. Perform a search and select images to build up your history.
+          {t('common:noDataDescription')}
         </p>
       </div>
     );
@@ -80,7 +82,7 @@ export function SearchHistory({
     <div>
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2 text-sm text-muted-foreground">
-          <span>{history.length} item{history.length !== 1 ? 's' : ''}</span>
+          <span>{history.length} {history.length === 1 ? t('common:item') : t('common:items')}</span>
         </div>
         {history.length > 0 && (
           <Button
@@ -90,7 +92,7 @@ export function SearchHistory({
             className="text-xs sm:text-sm h-9 sm:h-8"
           >
             <Trash2 className="h-3 w-3 mr-1" />
-            Clear All
+{t('common:clearAll')}
           </Button>
         )}
       </div>
@@ -119,7 +121,7 @@ export function SearchHistory({
                   </div>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
                     <span>{formatRelativeTime(entry.timestamp)}</span>
-                    <span>{selectedImageCount} image{selectedImageCount !== 1 ? 's' : ''} selected</span>
+                    <span>{selectedImageCount} {selectedImageCount === 1 ? t('common:image') : t('common:images')} {t('common:selected')}</span>
                   </div>
                 </div>
                 <Button
@@ -188,7 +190,7 @@ export function SearchHistory({
                     ) : (
                       <Copy className="h-3 w-3 mr-1" />
                     )}
-                    {isCopying ? 'Copied!' : 'Copy'}
+                    {isCopying ? t('common:copied') : t('common:copy')}
                   </Button>
                   <Button
                     variant="outline"
@@ -198,7 +200,7 @@ export function SearchHistory({
                     className="text-xs sm:text-sm h-9 sm:h-8"
                   >
                     <Search className="h-3 w-3 mr-1" />
-                    {isLoading ? 'Searching...' : 'Search Again'}
+                    {isLoading ? t('common:searching') : t('search:searchAgain')}
                   </Button>
                 </div>
               </div>

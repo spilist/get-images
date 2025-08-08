@@ -1,0 +1,120 @@
+{
+  "title": "설정",
+  "apiKey": {
+    "title": "API 키",
+    "label": "SERPAPI 키",
+    "placeholder": "SERPAPI 키를 입력하세요",
+    "save": "키 저장",
+    "clear": "키 삭제",
+    "show": "보이기",
+    "hide": "숨기기",
+    "getKey": "SERPAPI 키 얻기",
+    "usage": "API 키 사용량",
+    "monthlySearchesLeft": "월간 검색 횟수 남음",
+    "exhausted": "소진됨",
+    "validationError": "API 키를 입력하세요",
+    "formatError": "잘못된 API 키 형식입니다",
+    "saveSuccess": "API 키가 성공적으로 저장되었습니다!",
+    "saveError": "API 키 저장에 실패했습니다",
+    "clearSuccess": "API 키가 성공적으로 삭제되었습니다!",
+    "clearError": "API 키 삭제에 실패했습니다",
+    "xssWarning": "⚠️ 브라우저 저장소에 API 키를 저장하는 것은 XSS 위험이 있습니다. 프로덕션 환경에서는 환경 변수 사용을 권장합니다."
+  },
+    "searchOptions": {
+      "title": "검색 옵션",
+      "saveOptions": "옵션 저장",
+      "resetOptions": "옵션 초기화",
+      "saveSuccess": "검색 옵션이 성공적으로 저장되었습니다!",
+      "saveError": "검색 옵션 저장에 실패했습니다.",
+      "resetSuccess": "검색 옵션이 기본값으로 초기화되었습니다.",
+      "engine": {
+        "label": "검색 엔진",
+        "placeholder": "검색 엔진 선택",
+        "googleImages": "구글 이미지 (전체)",
+        "googleImagesDescription": "느리지만 원본 해상도 이미지",
+        "googleImagesLight": "구글 이미지 라이트 (빠름)",
+        "googleImagesLightDescription": "빠르지만 썸네일 이미지만"
+      },
+      "licenses": {
+        "label": "라이선스",
+        "placeholder": "라이선스 유형 선택",
+        "options": {
+          "all": "모든 라이선스",
+          "f": "사용 또는 공유 가능",
+          "fc": "상업적 사용 또는 공유 가능",
+          "fm": "사용·공유 또는 수정 가능",
+          "fmc": "상업적 사용·공유 또는 수정 가능",
+          "cl": "크리에이티브 커먼즈",
+          "ol": "상업용 및 기타 라이선스"
+        }
+      },
+      "language": {
+        "label": "검색 언어",
+        "placeholder": "언어 선택"
+      },
+      "startDate": {
+        "label": "시작 날짜"
+      },
+      "aspect": {
+        "label": "종횡비",
+        "placeholder": "종횡비 선택",
+        "any": "전체",
+        "tall": "세로",
+        "square": "정사각형",
+        "wide": "가로",
+        "panoramic": "파노라마"
+      },
+      "size": {
+        "label": "이미지 크기",
+        "placeholder": "크기 선택",
+        "any": "전체 크기",
+        "large": "큰 이미지",
+        "medium": "중간 이미지",
+        "small": "작은 이미지",
+        "icon": "아이콘"
+      },
+      "type": {
+        "label": "이미지 유형",
+        "placeholder": "유형 선택",
+        "any": "전체 유형",
+        "face": "얼굴",
+        "photo": "사진",
+        "clipart": "클립아트",
+        "lineart": "선그림",
+        "animated": "애니메이션"
+      },
+      "safeSearch": {
+        "label": "세이프 서치",
+        "description": "성인 콘텐츠 필터 사용"
+      }
+    },
+  "interface": {
+    "title": "인터페이스",
+    "language": {
+      "label": "표시 언어",
+      "english": "English",
+      "korean": "한국어"
+    }
+  },
+  "instructions": {
+    "description": "SERPAPI 키와 검색 옵션을 설정하세요.",
+    "steps": {
+      "visitSerpapi": "1. <serpapiLink>serpapi.com/manage-api-key</serpapiLink>를 방문하여 API 키를 받으세요",
+      "signUp": "2. 계정에 가입하거나 로그인하세요",
+      "copyKey": "3. API 키를 복사하여 위에 붙여넣으세요"
+    }
+  },
+  "status": {
+    "currentStatus": "현재 상태:",
+    "environmentKey": "환경 키",
+    "userKey": "사용자 키",
+    "yourKey": "사용자 키"
+  },
+  "usage": {
+    "usedThisMonth": "이번 달 사용량",
+    "lastChecked": "마지막 확인"
+  },
+  "datePicker": {
+    "placeholder": "날짜 선택"
+  }
+}

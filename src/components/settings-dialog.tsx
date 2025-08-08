@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useTranslation, Trans } from "react-i18next";
 import { Eye, EyeOff, Settings, ExternalLink, Key, Trash2, Save, AlertCircle, CheckCircle2 } from "lucide-react";
 import {
   Dialog,
@@ -36,6 +37,7 @@ import type { SearchFilters, LicenseType, AspectRatio, ImageSize, ImageType } fr
 import type { ApiKeyUsage } from '@/lib/api-key-usage';
 import languages from '@/../references/google-languages.json';
 import { ApiKeyConfig } from "@/types/api";
+import LanguageSwitcher from "@/components/language-switcher";
 
 interface SettingsDialogProps {
   trigger?: React.ReactNode;
@@ -43,6 +45,7 @@ interface SettingsDialogProps {
 }
 
 export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps) {
+  const { t } = useTranslation(['common', 'settings']);
   const [isOpen, setIsOpen] = useState(false);
   const [apiKeyInput, setApiKeyInput] = useState("");
   const [showApiKey, setShowApiKey] = useState(false);
@@ -118,19 +121,19 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
 
     try {
       if (!apiKeyInput.trim()) {
-        setError("Please enter an API key");
+        setError(t('settings:apiKey.validationError'));
         return;
       }
 
       const validation = validateApiKeyFormat(apiKeyInput);
       if (!validation.isValid) {
-        setError(validation.error || "Invalid API key format");
+        setError(validation.error || t('settings:apiKey.formatError'));
         return;
       }
 
       const success = storeApiKey(apiKeyInput);
       if (!success) {
-        setError("Failed to save API key. Please check your browser settings.");
+        setError(t('settings:apiKey.saveError'));
         return;
       }
 
@@ -142,7 +145,7 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
       };
       
       setCurrentConfig(newConfig);
-      setSuccess("API key saved successfully!");
+      setSuccess(t('settings:apiKey.saveSuccess'));
       
       // Notify parent component
       onApiKeyChange?.(newConfig);
@@ -152,7 +155,7 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
         setIsOpen(false);
       }, 1500);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to save API key");
+      setError(err instanceof Error ? err.message : t('settings:apiKey.saveError'));
     } finally {
       setIsLoading(false);
     }
@@ -166,7 +169,7 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
     try {
       const success = removeStoredApiKey();
       if (!success) {
-        setError("Failed to clear API key");
+        setError(t('settings:apiKey.clearError'));
         return;
       }
 
@@ -180,13 +183,13 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
       };
       
       setCurrentConfig(newConfig);
-      setSuccess("API key cleared. Using environment key.");
+      setSuccess(t('settings:apiKey.clearSuccess'));
       
       // Notify parent component
       onApiKeyChange?.(newConfig);
       
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Failed to clear API key");
+      setError(err instanceof Error ? err.message : t('settings:apiKey.clearError'));
     } finally {
       setIsLoading(false);
     }
@@ -212,22 +215,22 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
   const handleSaveFilters = () => {
     const success = storeSearchFilters(searchFilters);
     if (success) {
-      setSuccess("Search options saved successfully!");
+      setSuccess(t('settings:searchOptions.saveSuccess'));
     } else {
-      setError("Failed to save search options.");
+      setError(t('settings:searchOptions.saveError'));
     }
   };
 
   const handleResetFilters = () => {
     setSearchFilters({});
     setStartDate(undefined);
-    setSuccess("Search options reset to default.");
+    setSuccess(t('settings:searchOptions.resetSuccess'));
   };
 
   const defaultTrigger = (
     <Button variant="outline" size="sm" className="flex items-center gap-2">
       <Settings className="h-4 w-4" />
-      Settings
+      {t('settings:title')}
     </Button>
   );
 
@@ -241,10 +244,10 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
         <DialogHeader>
           <DialogTitle className="flex items-center gap-2">
             <Settings className="h-5 w-5" />
-            Settings
+            {t('settings:title')}
           </DialogTitle>
           <DialogDescription>
-            Configure your SERPAPI key and search options.
+            {t('settings:instructions.description')}
           </DialogDescription>
         </DialogHeader>
 
@@ -254,7 +257,7 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Key className="h-4 w-4" />
-                <h3 className="text-lg font-semibold">API Key</h3>
+                <h3 className="text-lg font-semibold">{t('settings:apiKey.title')}</h3>
               </div>
               <div className="flex gap-2">
                 {hasUserApiKey() && (
@@ -266,7 +269,7 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
                     className="flex items-center gap-2"
                   >
                     <Trash2 className="h-4 w-4" />
-                    Clear Key
+                    {t('settings:apiKey.clear')}
                   </Button>
                 )}
                 <Button
@@ -276,7 +279,7 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
                   className="flex items-center gap-2"
                 >
                   <Save className="h-4 w-4" />
-                  {isLoading ? "Saving..." : "Save Key"}
+                  {isLoading ? t('common:saving') : t('settings:apiKey.save')}
                 </Button>
               </div>
             </div>
@@ -284,9 +287,9 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
             {/* Current Status */}
             <div className="flex items-center justify-between p-3 rounded-lg bg-muted/50">
             <div className="flex items-center gap-2">
-              <span className="text-sm font-medium">Current Status:</span>
+              <span className="text-sm font-medium">{t('settings:status.currentStatus')}</span>
               <Badge variant={currentConfig?.source === 'user' ? 'default' : 'secondary'}>
-                {currentConfig?.source === 'user' ? 'User Key' : 'Environment Key'}
+                {currentConfig?.source === 'user' ? t('settings:status.userKey') : t('settings:status.environmentKey')}
               </Badge>
             </div>
             <div className="flex items-center gap-1">
@@ -296,19 +299,20 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
                 <AlertCircle className="h-4 w-4 text-yellow-500" />
               )}
             </div>
+            </div>
           </div>
 
           {/* API Key Input */}
           <div className="space-y-2">
             <Label htmlFor="apikey">
-              SERPAPI Key
+              {t('settings:apiKey.label')}
               <span className="text-destructive ml-1">*</span>
             </Label>
             <div className="relative">
               <Input
                 id="apikey"
                 type={showApiKey ? "text" : "password"}
-                placeholder="Enter your SERPAPI key (64 characters)"
+                placeholder={t('settings:apiKey.placeholder')}
                 value={apiKeyInput}
                 onChange={(e) => setApiKeyInput(e.target.value)}
                 className="pr-10"
@@ -328,7 +332,7 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
                   <Eye className="h-4 w-4" />
                 )}
                 <span className="sr-only">
-                  {showApiKey ? "Hide" : "Show"} API key
+                  {showApiKey ? t('settings:apiKey.hide') : t('settings:apiKey.show')} API key
                 </span>
               </Button>
             </div>
@@ -337,23 +341,25 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
           {/* Instructions */}
           <Alert>
             <ExternalLink className="h-4 w-4" />
-            <AlertTitle>Get your SERPAPI key</AlertTitle>
+            <AlertTitle>{t('settings:apiKey.getKey')}</AlertTitle>
             <AlertDescription className="space-y-1">
               <p className="text-sm">
-                1. Visit{" "}
-                <a
-                  href="https://serpapi.com/manage-api-key"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="underline text-primary hover:text-primary/80"
-                >
-                  serpapi.com/manage-api-key
-                </a>
+                <Trans
+                  i18nKey="settings:instructions.steps.visitSerpapi"
+                  components={{
+                    serpapiLink: <a
+                      href="https://serpapi.com/manage-api-key"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="underline text-primary hover:text-primary/80"
+                    />
+                  }}
+                />
               </p>
-              <p className="text-sm">2. Sign up or log in to your account</p>
-              <p className="text-sm">3. Copy your API key and paste it above</p>
+              <p className="text-sm">{t('settings:instructions.steps.signUp')}</p>
+              <p className="text-sm">{t('settings:instructions.steps.copyKey')}</p>
               <p className="text-xs text-muted-foreground mt-2">
-                Your API key is stored locally in your browser&apos;s `localStorage`. While convenient, this can be vulnerable to cross-site scripting (XSS) attacks on compromised websites. Never share your browser session or use this feature on untrusted computers.
+                {t('settings:apiKey.xssWarning')}
               </p>
             </AlertDescription>
           </Alert>
@@ -384,16 +390,16 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Key className="h-4 w-4" />
-                <h3 className="text-lg font-semibold">API Key Usage</h3>
+                <h3 className="text-lg font-semibold">{t('settings:apiKey.usage')}</h3>
               </div>
               <Button variant="outline" size="sm" onClick={fetchApiUsage} disabled={usageLoading}>
-                {usageLoading ? "Loading..." : "Refresh"}
+                {usageLoading ? t('common:loading') : t('common:refresh')}
               </Button>
             </div>
 
             {usageLoading ? (
               <div className="text-center py-4 text-muted-foreground">
-                Loading API usage information...
+{t('common:loading')} API usage information...
               </div>
             ) : (
               <div className="space-y-3">
@@ -403,10 +409,10 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
                       <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                           <Badge variant={usage.keyType === 'user' ? 'default' : 'secondary'}>
-                            {usage.keyType === 'user' ? 'Your Key' : 'Environment Key'} {usage.apiKey}
+                            {usage.keyType === 'user' ? t('settings:status.yourKey') : t('settings:status.environmentKey')} {usage.apiKey}
                           </Badge>
                           {usage.isExhausted && (
-                            <Badge variant="destructive">Exhausted</Badge>
+                            <Badge variant="destructive">{t('settings:apiKey.exhausted')}</Badge>
                           )}
                           {usage.error && (
                             <Badge variant="outline" className="text-yellow-600">Error</Badge>
@@ -421,13 +427,13 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
                       ) : (
                         <div className="flex justify-between items-center">
                           <div className="flex-1">
-                            <div className="text-sm text-muted-foreground mb-1">Monthly Searches Left</div>
+                            <div className="text-sm text-muted-foreground mb-1">{t('settings:apiKey.monthlySearchesLeft')}</div>
                             <div className={`text-2xl font-bold ${usage.planSearchesLeft === 0 ? 'text-red-500' : usage.planSearchesLeft < 100 ? 'text-yellow-500' : 'text-green-500'}`}>
                               {usage.planSearchesLeft.toLocaleString()}
                             </div>
                           </div>
                           <div className="flex-1 text-right">
-                            <div className="text-sm text-muted-foreground mb-1">Used This Month</div>
+                            <div className="text-sm text-muted-foreground mb-1">{t('settings:usage.usedThisMonth')}</div>
                             <div className="text-xl font-semibold text-muted-foreground">
                               {usage.thisMonthUsage.toLocaleString()}
                             </div>
@@ -436,7 +442,7 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
                       )}
                       
                       <div className="text-xs text-muted-foreground mt-2">
-                        Last checked: {new Date(usage.lastChecked).toLocaleString()}
+                        {t('settings:usage.lastChecked')}: {new Date(usage.lastChecked).toLocaleString()}
                       </div>
                     </div>
                   ))
@@ -456,14 +462,14 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
-                <h3 className="text-lg font-semibold">Search Options</h3>
+                <h3 className="text-lg font-semibold">{t('settings:searchOptions.title')}</h3>
               </div>
               <div className="flex gap-2">
                 <Button variant="outline" size="sm" onClick={handleResetFilters}>
-                  Reset
+                  {t('common:reset')}
                 </Button>
                 <Button size="sm" onClick={handleSaveFilters}>
-                  Save Options
+                  {t('settings:searchOptions.saveOptions')}
                 </Button>
               </div>
             </div>
@@ -472,28 +478,28 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
               {/* Engine Selection */}
               <div className="space-y-2">
                 <Label htmlFor="engine" className="text-sm font-medium">
-                  Search Engine
+                  {t('settings:searchOptions.engine.label')}
                 </Label>
                 <Select
                   value={searchFilters.engine || 'google_images'}
                   onValueChange={(value: 'google_images' | 'google_images_light') => updateFilter('engine', value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select search engine">
-                      {searchFilters.engine === 'google_images_light' ? 'Google Images Light (Fast)' : 'Google Images (Full)'}
+                    <SelectValue placeholder={t('settings:searchOptions.engine.placeholder')}>
+                      {searchFilters.engine === 'google_images_light' ? t('settings:searchOptions.engine.googleImagesLight') : t('settings:searchOptions.engine.googleImages')}
                     </SelectValue>
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="google_images_light">
                       <div className="flex flex-col">
-                        <span>Google Images Light (Fast)</span>
-                        <span className="text-xs text-muted-foreground">Faster but thumbnail images only</span>
+                        <span>{t('settings:searchOptions.engine.googleImagesLight')}</span>
+                        <span className="text-xs text-muted-foreground">{t('settings:searchOptions.engine.googleImagesLightDescription')}</span>
                       </div>
                     </SelectItem>
                     <SelectItem value="google_images">
                       <div className="flex flex-col">
-                        <span>Google Images (Full)</span>
-                        <span className="text-xs text-muted-foreground">Slower but full resolution images</span>
+                        <span>{t('settings:searchOptions.engine.googleImages')}</span>
+                        <span className="text-xs text-muted-foreground">{t('settings:searchOptions.engine.googleImagesDescription')}</span>
                       </div>
                     </SelectItem>
                   </SelectContent>
@@ -503,39 +509,39 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
               {/* Licenses */}
               <div className="space-y-2">
                 <Label htmlFor="licenses" className="text-sm font-medium">
-                  Licenses
+                  {t('settings:searchOptions.licenses.label')}
                 </Label>
                 <Select
                   value={searchFilters.licenses || 'all'}
                   onValueChange={(value: string) => updateFilter('licenses', value === 'all' ? undefined : value as LicenseType)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select license type" />
+                    <SelectValue placeholder={t('settings:searchOptions.licenses.placeholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="all">All licenses</SelectItem>
-                    <SelectItem value="f">Free to use or share</SelectItem>
-                    <SelectItem value="fc">Free to use or share, commercially</SelectItem>
-                    <SelectItem value="fm">Free to use, share or modify</SelectItem>
-                    <SelectItem value="fmc">Free to use, share or modify, commercially</SelectItem>
-                    <SelectItem value="cl">Creative Commons licenses</SelectItem>
-                    <SelectItem value="ol">Commercial and other licenses</SelectItem>
+                    <SelectItem value="all">{t('settings:searchOptions.licenses.options.all')}</SelectItem>
+                    <SelectItem value="f">{t('settings:searchOptions.licenses.options.f')}</SelectItem>
+                    <SelectItem value="fc">{t('settings:searchOptions.licenses.options.fc')}</SelectItem>
+                    <SelectItem value="fm">{t('settings:searchOptions.licenses.options.fm')}</SelectItem>
+                    <SelectItem value="fmc">{t('settings:searchOptions.licenses.options.fmc')}</SelectItem>
+                    <SelectItem value="cl">{t('settings:searchOptions.licenses.options.cl')}</SelectItem>
+                    <SelectItem value="ol">{t('settings:searchOptions.licenses.options.ol')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Language */}
               <div className="space-y-2">
-                <Label htmlFor="language">Language</Label>
+                <Label htmlFor="language">{t('settings:searchOptions.language.label')}</Label>
                 <Select
                   value={searchFilters.hl || 'default'}
                   onValueChange={(value: string) => updateFilter('hl', value === 'default' ? undefined : value)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select language" />
+                    <SelectValue placeholder={t('settings:searchOptions.language.placeholder')} />
                   </SelectTrigger>
                   <SelectContent className="max-h-60">
-                    <SelectItem value="default">Default</SelectItem>
+                    <SelectItem value="default">{t('common:default')}</SelectItem>
                     {/* Popular languages first */}
                     <SelectItem value="en">English</SelectItem>
                     <SelectItem value="ko">Korean</SelectItem>
@@ -561,7 +567,7 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
 
               {/* Start Date */}
               <div className="space-y-2">
-                <Label>Start Date</Label>
+                <Label>{t('settings:searchOptions.startDate.label')}</Label>
                 <Popover>
                   <PopoverTrigger asChild>
                     <Button
@@ -569,7 +575,7 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
                       className={`w-full justify-start text-left font-normal ${!startDate && "text-muted-foreground"}`}
                     >
                       <CalendarIcon className="mr-2 h-4 w-4" />
-                      {startDate ? format(startDate, "PPP") : <span>Pick a date</span>}
+                      {startDate ? format(startDate, "PPP") : <span>{t('settings:datePicker.placeholder')}</span>}
                     </Button>
                   </PopoverTrigger>
                   <PopoverContent className="w-auto p-0">
@@ -585,39 +591,39 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
 
               {/* Aspect Ratio */}
               <div className="space-y-2">
-                <Label htmlFor="aspect">Aspect Ratio</Label>
+                <Label htmlFor="aspect">{t('settings:searchOptions.aspect.label')}</Label>
                 <Select
                   value={searchFilters.imgar || 'any'}
                   onValueChange={(value: string) => updateFilter('imgar', value === 'any' ? undefined : value as AspectRatio)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select aspect ratio" />
+                    <SelectValue placeholder={t('settings:searchOptions.aspect.placeholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="any">Any</SelectItem>
-                    <SelectItem value="s">Square</SelectItem>
-                    <SelectItem value="t">Tall</SelectItem>
-                    <SelectItem value="w">Wide</SelectItem>
-                    <SelectItem value="xw">Panoramic</SelectItem>
+                    <SelectItem value="any">{t('settings:searchOptions.aspect.any')}</SelectItem>
+                    <SelectItem value="s">{t('settings:searchOptions.aspect.square')}</SelectItem>
+                    <SelectItem value="t">{t('settings:searchOptions.aspect.tall')}</SelectItem>
+                    <SelectItem value="w">{t('settings:searchOptions.aspect.wide')}</SelectItem>
+                    <SelectItem value="xw">{t('settings:searchOptions.aspect.panoramic')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Image Size */}
               <div className="space-y-2">
-                <Label htmlFor="size">Image Size</Label>
+                <Label htmlFor="size">{t('settings:searchOptions.size.label')}</Label>
                 <Select
                   value={searchFilters.imgsz || 'any'}
                   onValueChange={(value: string) => updateFilter('imgsz', value === 'any' ? undefined : value as ImageSize)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select size" />
+                    <SelectValue placeholder={t('settings:searchOptions.size.placeholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="any">Any size</SelectItem>
-                    <SelectItem value="i">Icon</SelectItem>
-                    <SelectItem value="m">Medium</SelectItem>
-                    <SelectItem value="l">Large</SelectItem>
+                    <SelectItem value="any">{t('settings:searchOptions.size.any')}</SelectItem>
+                    <SelectItem value="i">{t('settings:searchOptions.size.icon')}</SelectItem>
+                    <SelectItem value="m">{t('settings:searchOptions.size.medium')}</SelectItem>
+                    <SelectItem value="l">{t('settings:searchOptions.size.large')}</SelectItem>
                     <SelectItem value="2mp">2MP</SelectItem>
                     <SelectItem value="4mp">4MP</SelectItem>
                     <SelectItem value="6mp">6MP</SelectItem>
@@ -634,28 +640,28 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
 
               {/* Image Type */}
               <div className="space-y-2">
-                <Label htmlFor="type">Image Type</Label>
+                <Label htmlFor="type">{t('settings:searchOptions.type.label')}</Label>
                 <Select
                   value={searchFilters.image_type || 'any'}
                   onValueChange={(value: string) => updateFilter('image_type', value === 'any' ? undefined : value as ImageType)}
                 >
                   <SelectTrigger>
-                    <SelectValue placeholder="Select type" />
+                    <SelectValue placeholder={t('settings:searchOptions.type.placeholder')} />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="any">Any type</SelectItem>
-                    <SelectItem value="face">Face</SelectItem>
-                    <SelectItem value="photo">Photo</SelectItem>
-                    <SelectItem value="clipart">Clip Art</SelectItem>
-                    <SelectItem value="lineart">Line Drawing</SelectItem>
-                    <SelectItem value="animated">Animated</SelectItem>
+                    <SelectItem value="any">{t('settings:searchOptions.type.any')}</SelectItem>
+                    <SelectItem value="face">{t('settings:searchOptions.type.face')}</SelectItem>
+                    <SelectItem value="photo">{t('settings:searchOptions.type.photo')}</SelectItem>
+                    <SelectItem value="clipart">{t('settings:searchOptions.type.clipart')}</SelectItem>
+                    <SelectItem value="lineart">{t('settings:searchOptions.type.lineart')}</SelectItem>
+                    <SelectItem value="animated">{t('settings:searchOptions.type.animated')}</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
 
               {/* Safe Search */}
               <div className="space-y-2">
-                <Label>Safe Search</Label>
+                <Label>{t('settings:searchOptions.safeSearch.label')}</Label>
                 <div className="flex items-center space-x-2">
                   <Switch
                     id="safe-search"
@@ -663,11 +669,22 @@ export function SettingsDialog({ trigger, onApiKeyChange }: SettingsDialogProps)
                     onCheckedChange={(checked) => updateFilter('safe', checked ? 'active' : 'off')}
                   />
                   <Label htmlFor="safe-search" className="text-sm">
-                    Enable safe search filter
+                    {t('settings:searchOptions.safeSearch.description')}
                   </Label>
                 </div>
               </div>
+          </div>
+
+          <Separator />
+
+          {/* Interface Section */}
+          <div className="space-y-4">
+            <div className="flex items-center gap-2">
+              <Settings className="h-4 w-4" />
+              <h3 className="text-lg font-semibold">{t('settings:interface.title')}</h3>
             </div>
+            
+            <LanguageSwitcher />
           </div>
         </div>
 

@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { CheckCircle2, Search } from "lucide-react";
 import { ImageResult, SelectedImages, MultipleKeywordsResponse } from "@/types/api";
+import { useTranslation } from "react-i18next";
 
 interface ImageThumbnailProps {
   image: ImageResult;
@@ -63,6 +64,7 @@ function KeywordImageGrid({
   onSelectImage,
   onImageError
 }: KeywordImageGridProps) {
+  const { t } = useTranslation(['search']);
   return (
     <div>
       <div className="flex items-center gap-2 mb-3 flex-wrap">
@@ -71,12 +73,12 @@ function KeywordImageGrid({
           <Badge variant="outline" className="text-xs">
             {(() => {
               const availableCount = result.images.filter(image => !failedImages.has(image.url)).length;
-              return `${availableCount} available`;
+              return t('search:availableCount', { count: availableCount });
             })()}
           </Badge>
         ) : (
           <Badge variant="destructive" className="text-xs">
-            Failed
+            {t('search:failed')}
           </Badge>
         )}
       </div>
@@ -98,13 +100,13 @@ function KeywordImageGrid({
             </div>
           ) : (
             <div className="text-xs sm:text-sm text-muted-foreground p-3 sm:p-4 text-center bg-muted rounded-lg">
-              Images unavailable - all sources failed to load
+              {t('search:imagesUnavailable')}
             </div>
           );
         })()
       ) : (
         <div className="text-xs sm:text-sm text-muted-foreground p-3 sm:p-4 text-center bg-muted rounded-lg">
-          {result.error || "No images found"}
+          {result.error || t('search:noResults')}
         </div>
       )}
     </div>
@@ -128,6 +130,7 @@ export function ImageResultsDisplay({
   onSelectImage,
   onImageError
 }: ImageResultsDisplayProps) {
+  const { t } = useTranslation(['search']);
   if (isLoading) {
     return (
       <div className="space-y-4 sm:space-y-6">
@@ -166,7 +169,7 @@ export function ImageResultsDisplay({
   return (
     <div className="text-center text-muted-foreground py-8 sm:py-12">
       <Search className="h-8 w-8 sm:h-12 sm:w-12 mx-auto mb-3 sm:mb-4 opacity-50" />
-      <p className="text-sm sm:text-base">Enter keywords and click search to find images</p>
+      <p className="text-sm sm:text-base">{t('search:emptyStateHint')}</p>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -35,6 +36,7 @@ export function SearchPanel({
   error,
   searchHistoryTrigger
 }: SearchPanelProps) {
+  const { t } = useTranslation(['search', 'common']);
   const [keywordsInput, setKeywordsInput] = useState("");
   const [copyStatus, setCopyStatus] = useState<"idle" | "success" | "error">("idle");
 
@@ -54,7 +56,7 @@ export function SearchPanel({
   };
 
   const handleSample = () => {
-    setKeywordsInput("삼계탕\n추어탕\n장어\n전복죽\n콩국수");
+    setKeywordsInput(t('search:sampleKeywords'));
     onSample();
   };
 
@@ -81,7 +83,7 @@ export function SearchPanel({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2 flex-wrap">
             <Search className="h-4 w-4" />
-            <span className="text-sm font-medium">Keywords (max 10)</span>
+            <span className="text-sm font-medium">{t('search:keywords')}</span>
           </div>
           {searchHistoryTrigger && (
             <div className="flex-shrink-0">
@@ -90,7 +92,7 @@ export function SearchPanel({
           )}
         </div>
         <p className="text-xs text-muted-foreground">
-          Enter each keyword on a new line to search for multiple images
+          {t('search:keywordsInstruction')}
         </p>
         <div className="flex items-center gap-2 flex-wrap">
           <Badge variant="outline" className="text-xs">
@@ -107,23 +109,20 @@ export function SearchPanel({
             
             return duplicateCount > 0 ? (
               <Badge variant="secondary" className="text-xs">
-                -{duplicateCount} duplicate{duplicateCount > 1 ? 's' : ''}
+                -{duplicateCount} {duplicateCount > 1 ? t('search:duplicates') : t('search:duplicate')}
               </Badge>
             ) : null;
           })()}
           <Badge 
             variant={hasUserKey ? "default" : "secondary"} 
             className="text-xs"
-            title={hasUserKey ? "Using your personal SERPAPI key" : "Using environment SERPAPI key"}
+            title={hasUserKey ? t('search:personalKeyTooltip') : t('search:envKeyTooltip')}
           >
-            {hasUserKey ? "Personal" : "Env Key"}
+            {hasUserKey ? t('search:personalKey') : t('search:envKey')}
           </Badge>
         </div>
         <Textarea
-          placeholder={`삼계탕
-추어탕
-김치찌개
-된장찌개`}
+          placeholder={t('search:placeholder')}
           value={keywordsInput}
           onChange={(e) => setKeywordsInput(e.target.value)}
           className="min-h-16 sm:min-h-20 resize-none text-sm"
@@ -137,7 +136,7 @@ export function SearchPanel({
           disabled={isLoading}
           className={buttonBaseClasses}
         >
-          {isLoading ? "Searching..." : "Search Images"}
+          {isLoading ? t('search:loadingResults') : t('search:searchImages')}
         </Button>
         <Button 
           onClick={handleSample} 
@@ -145,7 +144,7 @@ export function SearchPanel({
           variant="outline"
           className={buttonBaseClasses}
         >
-          {isLoading ? "Loading..." : "Examples"}
+          {isLoading ? t('common:loading') : t('search:examples')}
         </Button>
         {selectedImageCount > 0 && (
           <Button
@@ -158,7 +157,7 @@ export function SearchPanel({
             ) : (
               <Copy className="h-4 w-4" />
             )}
-            {copyStatus === "success" ? "Copied!" : "Copy Results"}
+            {copyStatus === "success" ? t('search:copySuccess') : t('search:copyUrls')}
           </Button>
         )}
       </div>

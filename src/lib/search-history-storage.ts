@@ -1,4 +1,5 @@
 import { SearchHistoryEntry } from '@/types/api';
+import i18next from '@/i18n';
 import { SearchFilters } from './serpapi.service';
 
 const SEARCH_HISTORY_STORAGE_KEY = 'search_history';
@@ -107,12 +108,16 @@ export function formatRelativeTime(timestamp: number): string {
   const diffMinutes = Math.floor(diffMs / (1000 * 60));
   const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
   const diffDays = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-  
-  if (diffMinutes < 1) return 'Just now';
-  if (diffMinutes < 60) return `${diffMinutes}m ago`;
-  if (diffHours < 24) return `${diffHours}h ago`;
-  if (diffDays < 7) return `${diffDays}d ago`;
-  
-  // For older entries, show the actual date
-  return new Date(timestamp).toLocaleDateString();
+
+  if (diffMinutes < 1) return i18next.t('common:time.justNow');
+  if (diffMinutes < 60) return i18next.t('common:time.minutesAgo', { count: diffMinutes });
+  if (diffHours < 24) return i18next.t('common:time.hoursAgo', { count: diffHours });
+  if (diffDays < 7) return i18next.t('common:time.daysAgo', { count: diffDays });
+
+  // For older entries, show the actual date in current language
+  try {
+    return new Date(timestamp).toLocaleDateString(i18next.language || undefined);
+  } catch {
+    return new Date(timestamp).toLocaleDateString();
+  }
 }

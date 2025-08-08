@@ -16,6 +16,7 @@ A modern, intelligent web application for searching and collecting images from m
 - **Flexible API Keys**: Use default keys or configure your own
 - **Responsive Design**: Optimized for desktop and mobile
 - **Export Functionality**: Easy copy/export of results
+- **Internationalization**: Full support for Korean and English languages
 
 ---
 
@@ -124,6 +125,28 @@ GetImages supports two search engine modes, each optimized for different use cas
 | **Google Images Full** (Default) | 🐌 Slower | 🖼️ Full Resolution | Production use, high-quality needs |
 
 **Configuration**: Change engine in Settings → Search Options → Search Engine
+
+### Internationalization (i18n)
+
+GetImages provides full internationalization support with seamless language switching:
+
+| Feature | Description |
+|---------|-------------|
+| **Supported Languages** | English, Korean (한국어) |
+| **Language Switcher** | Available in Settings → Interface → Display Language |
+| **Automatic Detection** | Browser language detection with cookie persistence |
+| **Complete Coverage** | All UI elements, messages, and content translated |
+
+**Implementation Details**:
+- **Framework**: Built with [react-i18next](https://react.i18next.com/) following [Next.js App Router best practices](https://www.locize.com/blog/i18n-next-app-router)
+- **Architecture**: Namespace-based organization for maintainable translations
+- **Persistence**: Language preference stored in cookies across sessions
+- **Extensible**: Easy to add new languages - simply add locale files and update configuration
+
+**Adding New Languages**:
+1. Create translation files in `src/i18n/locales/[lang]/`
+2. Add language code to `languages` array in `src/i18n/settings.ts`
+3. Update language switcher options in `src/components/language-switcher.tsx`
 
 ### Advanced Filter Options
 
