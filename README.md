@@ -134,7 +134,7 @@ GetImages provides full internationalization support with seamless language swit
 |---------|-------------|
 | **Supported Languages** | English, Korean (한국어) |
 | **Language Switcher** | Available in Settings → Interface → Display Language |
-| **Automatic Detection** | Browser language detection with cookie persistence |
+| **Preference Persistence** | Language preference saved (localStorage + cookie) |
 | **Complete Coverage** | All UI elements, messages, and content translated |
 
 **Implementation Details**:

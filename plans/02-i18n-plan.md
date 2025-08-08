@@ -41,7 +41,7 @@ Based on codebase analysis, the following components contain user-facing text:
 
 #### 1.1 Dependencies Installation
 ```bash
-pnpm add react-i18next i18next i18next-resources-to-backend i18next-browser-languagedetector
+pnpm add react-i18next i18next i18next-resources-to-backend
 ```
 
 #### 1.2 Directory Structure
@@ -64,13 +64,13 @@ src/
 ```
 
 #### 1.3 i18n Configuration
-- Client-side configuration with browser language detection
+- Client-side configuration with manual language selection and preference persistence
 - Namespace separation for better organization
 - Fallback to English for missing translations
 - Cookie-based language persistence
 
 #### 1.4 Next.js 15 App Router Integration
-- Dynamic language detection
+- Client-side language preference persistence
 - Server-side rendering support
 - Middleware for language routing (optional)
 - Client component initialization
@@ -198,7 +198,7 @@ Create `src/components/language-switcher.tsx`:
 - Keyboard navigation preservation
 
 ### Browser Compatibility
-- Language detection fallbacks
+- Language preference persistence
 - LocalStorage vs Cookie preferences
 - Mobile browser considerations
 

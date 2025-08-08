@@ -17,7 +17,7 @@ This subagent specializes in implementing comprehensive internationalization (i1
 - **Translation Scope Planning**: Identify all translatable content including UI text, error messages, metadata, and form validation
 
 ### 2. React-i18next Implementation
-- **Client-side Setup**: Implement browser language detection with cookie persistence
+- **Client-side Setup**: Implement language preference persistence (localStorage/cookie)
 - **TypeScript Integration**: Ensure full type safety with translation keys and namespace patterns
 - **Provider Pattern**: Integrate I18nProvider into application root layout
 - **Hook Implementation**: Utilize useTranslation with multiple namespace support
@@ -39,7 +39,6 @@ This subagent specializes in implementing comprehensive internationalization (i1
 {
   "i18next": "^25.3.2",
   "react-i18next": "^15.6.1",
-  "i18next-browser-languagedetector": "^8.2.0",
   "i18next-resources-to-backend": "^1.2.1"
 }
 ```
@@ -77,12 +76,7 @@ export function getOptions(lng = fallbackLng, ns = defaultNS) {
     lng,
     fallbackNS: defaultNS,
     defaultNS,
-    ns,
-    detection: {
-      order: ['cookie', 'navigator'],
-      caches: ['cookie'],
-      lookupCookie: cookieName,
-    }
+    ns
   };
 }
 ```
@@ -95,28 +89,17 @@ export function getOptions(lng = fallbackLng, ns = defaultNS) {
 import i18next from 'i18next';
 import { initReactI18next } from 'react-i18next';
 import resourcesToBackend from 'i18next-resources-to-backend';
-import LanguageDetector from 'i18next-browser-languagedetector';
 import { getOptions, languages, cookieName } from './settings';
 
 const runsOnServerSide = typeof window === 'undefined';
 
 i18next
   .use(initReactI18next)
-  .use(LanguageDetector)
   .use(resourcesToBackend((language: string, namespace: string) => 
     import(`./locales/${language}/${namespace}.json`)
   ))
   .init({
     ...getOptions(),
-    detection: {
-      order: ['cookie', 'navigator'],
-      caches: ['cookie'],
-      lookupCookie: cookieName,
-      cookieOptions: {
-        path: '/',
-        sameSite: 'lax',
-      }
-    }
   });
 
 export default i18next;
@@ -438,15 +421,7 @@ const validateTranslations = (namespace: string, keys: string[]) => {
 
 ### 2. Translation Caching
 
-```typescript
-// Browser storage configuration
-detection: {
-  caches: ['cookie'], // Avoid localStorage for better performance
-  cookieOptions: {
-    maxAge: 365 * 24 * 60 * 60 // 1 year
-  }
-}
-```
+Use cookies and/or localStorage to persist the selected language preference across sessions.
 
 ## Deployment Considerations
 
@@ -513,10 +488,10 @@ export async function generateMetadata(): Promise<Metadata> {
 
 ### 1. Next.js App Router SSR Issues
 
-**Problem**: Server-client hydration mismatches with language detection
+**Problem**: Server-client hydration mismatches with i18n state
 
 **Solution**: 
-- Use client-side language detection only
+- Use client-side initialization only
 - Implement proper loading states
 - Avoid server-side translation rendering
 
