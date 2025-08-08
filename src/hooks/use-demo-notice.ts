@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from 'react';
+import { hasUserApiKey } from '@/lib/api-key-storage';
 
 const DEMO_NOTICE_KEY = 'demo-notice-closed-timestamp';
 const SHOW_AGAIN_AFTER_HOURS = 24;
@@ -12,6 +13,13 @@ export function useDemoNotice() {
   useEffect(() => {
     // Only run on client side
     if (typeof window === 'undefined') return;
+
+    // If a user API key is configured, never show the demo notice
+    if (hasUserApiKey()) {
+      setIsVisible(false);
+      setIsLoaded(true);
+      return;
+    }
 
     const closedTimestamp = localStorage.getItem(DEMO_NOTICE_KEY);
     
