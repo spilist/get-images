@@ -18,11 +18,9 @@
 - **내보내기 기능**: 결과 복사/내보내기 간편
 - **다국어 지원**: 한국어와 영어 완전 지원
 
----
-
 ## 🚀 빠른 시작
 
-### 옵션 1: 웹 애플리케이션 (권장)
+### 웹 애플리케이션 (권장)
 
 ```bash
 # 복제 및 설치
@@ -36,7 +34,7 @@ pnpm dev
 # http://localhost:3000 열기
 ```
 
-### 옵션 2: CLI 스크립트 (API 키 불필요)
+### CLI 스크립트 (API 키 불필요)
 
 ```bash
 # Python 의존성 설치
@@ -50,11 +48,9 @@ python scripts/scraper.py
 
 > **⚠️ 중요**: CLI 스크립트는 이미지 사용 권리에 대한 면책 고지를 표시합니다. 이 도구로 찾은 이미지를 사용하기 전에 저작권 허가 및 라이선스를 확인하는 것은 사용자의 책임입니다. 또한 핫링킹 방지로 인해 많은 이미지 링크가 원본 웹사이트 외부에서 작동하지 않을 수 있으므로 목표 환경에서 각 링크를 반드시 테스트하세요.
 
----
-
 ## ⚙️ 구성
 
-### SERPAPI 설정 (웹 인터페이스)
+### SERPAPI 설정
 
 1. **API 키 획득**: [serpapi.com/manage-api-key](https://serpapi.com/manage-api-key)에서 가입
 2. **앱에서 구성**: 설정 UI를 사용하여 키 입력
@@ -63,30 +59,6 @@ python scripts/scraper.py
    SERPAPI_KEY=your_primary_key_here
    SERPAPI_KEY2=your_secondary_key_here  # 선택사항: 자동 로테이션 활성화
    ```
-
-### 웹 분석 설정 (선택사항)
-
-GetImages는 사용자 행동 추적을 위한 웹 분석 통합을 지원합니다:
-
-```bash
-# Google Analytics
-NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX  # Google Analytics 4 측정 ID
-
-# Microsoft Clarity
-NEXT_PUBLIC_CLARITY_PROJECT_ID=xxxxxxxxx  # Clarity 프로젝트 ID
-```
-
-**분석 기능**:
-- **Google Analytics 4**: 페이지 조회, 사용자 참여도, 전환 추적
-- **Microsoft Clarity**: 히트맵, 세션 녹화, 사용자 행동 인사이트
-- **프라이버시 친화적**: 환경 변수가 설정된 경우에만 로드
-- **프로덕션 준비**: Next.js Script 컴포넌트를 사용한 최적화된 로딩 전략
-
-**설정 방법**:
-1. **Google Analytics**: [Google Analytics](https://analytics.google.com/)에서 측정 ID 확인
-2. **Microsoft Clarity**: [Clarity 대시보드](https://clarity.microsoft.com/)에서 프로젝트 ID 확인
-3. `.env.local` 파일에 각각의 환경 변수 추가
-4. 설정이 완료되면 분석이 자동으로 추적을 시작합니다
 
 **API 키 로테이션**: 여러 키를 설정하여 자동 로드 밸런싱 및 속도 제한 분산이 가능합니다.
 
@@ -126,6 +98,30 @@ GetImages는 각각 다른 용도에 최적화된 두 가지 검색 엔진 모�
 
 **설정 방법**: 설정 → 검색 옵션 → 검색 엔진에서 변경
 
+### 웹 분석 설정 (선택사항)
+
+GetImages는 사용자 행동 추적을 위한 웹 분석 통합을 지원합니다:
+
+```bash
+# Google Analytics
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX  # Google Analytics 4 측정 ID
+
+# Microsoft Clarity
+NEXT_PUBLIC_CLARITY_PROJECT_ID=xxxxxxxxx  # Clarity 프로젝트 ID
+```
+
+**분석 기능**:
+- **Google Analytics 4**: 페이지 조회, 사용자 참여도, 전환 추적
+- **Microsoft Clarity**: 히트맵, 세션 녹화, 사용자 행동 인사이트
+- **프라이버시 친화적**: 환경 변수가 설정된 경우에만 로드
+- **프로덕션 준비**: Next.js Script 컴포넌트를 사용한 최적화된 로딩 전략
+
+**설정 방법**:
+1. **Google Analytics**: [Google Analytics](https://analytics.google.com/)에서 측정 ID 확인
+2. **Microsoft Clarity**: [Clarity 대시보드](https://clarity.microsoft.com/)에서 프로젝트 ID 확인
+3. `.env.local` 파일에 각각의 환경 변수 추가
+4. 설정이 완료되면 분석이 자동으로 추적을 시작합니다
+
 ### 다국어 지원 (i18n)
 
 GetImages는 매끄러운 언어 전환이 가능한 완전한 다국어 지원을 제공합니다:
@@ -153,46 +149,7 @@ GetImages는 매끄러운 언어 전환이 가능한 완전한 다국어 지원�
 이미지 필터(라이선스, 크기, 유형 등)에 대한 자세한 정보는 다음을 참조하세요:
 [SERPAPI Google Images API 문서](https://serpapi.com/google-images-api)
 
----
-
-## ⚡ 성능 기능
-
-### 지능적 캐싱 시스템
-
-고급 캐싱 시스템이 제공하는 성능 향상:
-
-| 기능 | 장점 |
-|------|------|
-| **즉시 결과** | 캐시된 검색은 10ms 미만으로 반환 |
-| **비용 절감** | 중복 API 호출 제거 |
-| **속도 제한 보호** | API 사용량 감소 |
-| **스마트 키** | 쿼리 + 결과 수 + API 키 고려 |
-
-**예시**: "김치찌개" 같은 인기 검색어는 첫 검색 후 즉시 로드!
-
----
-
-## 🛠️ 개발
-
-```bash
-# 핫 리로드 개발 서버
-pnpm dev
-
-# 프로덕션 빌드
-pnpm build
-
-# 프로덕션 서버
-pnpm start
-
-# 코드 린팅
-pnpm lint
-
-# 테스팅
-pnpm test          # 모든 테스트 실행
-pnpm test:watch    # 워치 모드로 테스트 실행
-pnpm test:coverage # 커버리지 리포트와 함께 테스트 실행
-pnpm test:ci       # CI용 테스트 실행
-```
+## 🛡️ 아키텍처
 
 ### 프로젝트 구조
 
@@ -220,36 +177,78 @@ get-images/
 └── requirements.txt        # Python 의존성
 ```
 
-### 🛡️ 아키텍처 개요
+### 핵심 기능
 
-**타입 안전 API 키 관리**:
+**⚡ 지능적 캐싱 시스템**
+
+고급 캐싱 시스템이 제공하는 성능 향상:
+
+| 기능 | 장점 |
+|------|------|
+| **즉시 결과** | 캐시된 검색은 10ms 미만으로 반환 |
+| **비용 절감** | 중복 API 호출 제거 |
+| **속도 제한 보호** | API 사용량 감소 |
+| **스마트 키** | 쿼리 + 결과 수 + API 키 고려 |
+
+**예시**: "김치찌개" 같은 인기 검색어는 첫 검색 후 즉시 로드!
+
+**🔧 타입 안전 API 키 관리**:
 - `ApiKeyConfig` 인터페이스를 통한 일관된 키 처리
-- `useImageSearch` 훅에서 중앙화된 로직
+- `useImageSearch` 훅의 중앙화된 로직
 - 환경 변수와 사용자 제공 키 모두 지원
 
-**지능적 오류 처리**:
+**🛠️ 지능적 오류 처리**:
 - `SERPAPI_ERROR_MAP`에서 패턴 기반 오류 매핑
-- 다양한 시나리오에 대한 맥락 인식 오류 메시지
-- 다양한 API 실패 조건에 대한 우아한 대체
+- 다양한 시나리오별 컨텍스트 인식 메시지
+- 다양한 API 실패 조건에 대한 그레이스풀 폴백
 
-**스마트 키 선택**:
-- 사용량 기반 검증으로 기능적 키 우선순위 설정
+**📊 스마트 키 선택**:
+- 사용량 기반 검증으로 기능적 키 우선순위
 - 소진된 키 자동 제외
 - 키 상태 및 할당량 실시간 모니터링
 
----
+## 🛠️ 개발
 
-## 🧪 테스팅
+```bash
+# 핫 리로드 개발 서버
+pnpm dev
+
+# 프로덕션 빌드
+pnpm build
+
+# 프로덕션 서버
+pnpm start
+
+# 코드 린팅
+pnpm lint
+
+# 테스팅
+pnpm test          # 모든 테스트 실행
+pnpm test:watch    # 워치 모드로 테스트 실행
+pnpm test:coverage # 커버리지 리포트와 함께 테스트 실행
+pnpm test:ci       # CI용 테스트 실행
+```
+
+### 테스팅 인프라
 
 GetImages는 신뢰할 수 있는 코드 품질과 사용자 워크플로우 검증을 위해 **Jest**, **React Testing Library**, **MSW**로 구축된 포괄적인 테스팅 인프라를 포함합니다.
 
-### 테스팅 프레임워크
+**테스팅 프레임워크**:
 - **Jest 30+** Next.js 15 및 TypeScript 지원
 - **React Testing Library** 컴포넌트 및 훅 테스팅
 - **MSW (Mock Service Worker)** SERPAPI 응답 모킹
 - **140+ 테스트 케이스** 핵심 사용자 워크플로우 커버
 
-### 테스트 실행
+**테스트 커버리지**:
+
+| 컴포넌트 | 커버리지 중점 |
+|----------|---------------|
+| **훅 테스트** | 이미지 검색, API 키 관리, 검색 기록 |
+| **서비스 테스트** | SERPAPI 통합, 캐싱, 오류 처리 |
+| **API 테스트** | 검색 엔드포인트, 사용량 모니터링 |
+| **통합 테스트** | 엔드투엔드 사용자 워크플로우 |
+
+**테스트 실행**:
 
 ```bash
 # 모든 테스트 실행
@@ -265,16 +264,7 @@ pnpm test:coverage
 pnpm test:ci
 ```
 
-### 테스트 커버리지
-
-| 컴포넌트 | 커버리지 중점 |
-|----------|---------------|
-| **훅 테스트** | 이미지 검색, API 키 관리, 검색 기록 |
-| **서비스 테스트** | SERPAPI 통합, 캐싱, 오류 처리 |
-| **API 테스트** | 검색 엔드포인트, 사용량 모니터링 |
-| **통합 테스트** | 엔드투엔드 사용자 워크플로우 |
-
-### 테스트 아키텍처
+**테스트 아키텍처**:
 
 ```
 __tests__/
@@ -285,14 +275,12 @@ __tests__/
 └── fixtures/       # 모크 데이터 및 실제적인 테스트 시나리오
 ```
 
-### 주요 테스팅 기능
+**주요 테스팅 기능**:
 - **실제적인 데이터**: 한국 음식 키워드(삼계탕, 김치찌개) 사용으로 실제적인 테스팅
 - **API 모킹**: MSW를 통한 완전한 SERPAPI 응답 시뮬레이션
 - **오류 시나리오**: API 소진, 속도 제한, 무효한 키 테스트
 - **TypeScript 안전성**: 모든 테스트 파일에서 완전한 타입 체킹
 - **CI 통합**: 커버리지 리포팅을 포함한 자동화된 테스팅
-
----
 
 ## 🔧 API 사용법
 
@@ -326,8 +314,6 @@ const response = await fetch('/api/scraper', {
 });
 ```
 
----
-
 ## 🚀 배포
 
 ### Vercel (권장)
@@ -344,8 +330,6 @@ const response = await fetch('/api/scraper', {
 
 표준 Next.js 애플리케이션 - Node.js 호스팅 플랫폼과 호환됩니다.
 
----
-
 ## 🤖 AI 개발
 
 이 프로젝트는 의미 분석 기능을 갖춘 고급 AI 코딩 에이전트를 활용합니다:
@@ -354,8 +338,6 @@ const response = await fetch('/api/scraper', {
 - **[Serena MCP](https://github.com/oraios/serena)** - TypeScript/JavaScript용 고급 의미 코드 분석
 
 **더 알아보기**: [Serena MCP 가이드](https://hansdev.kr/tech/serena-mcp/) - 의미 분석으로 생산성을 극대화하는 포괄적인 블로그 포스트.
-
----
 
 ## ⚠️ 이미지 사용 면책 고지
 
@@ -383,22 +365,12 @@ const response = await fetch('/api/scraper', {
 
 이 도구는 발견된 이미지를 사용할 수 있는 권리를 부여하지 않습니다. 모든 저작권 및 지적 재산권은 각각의 소유자에게 있습니다.
 
----
-
 ## 🤝 기여하기
 
 1. 저장소 포크
 2. 기능 브랜치 생성: `git checkout -b feature-name`
 3. 변경사항 작성 및 철저한 테스트
 4. 풀 리퀘스트 제출
-
----
-
-## 📄 라이선스
-
-[MIT 라이선스](LICENSE) 하의 오픈소스.
-
----
 
 ## 💝 지원
 
@@ -408,10 +380,6 @@ const response = await fetch('/api/scraper', {
 
 제작자: [배휘동](https://stdy.blog)
 
----
+## 📄 라이선스
 
-## 📚 리소스
-
-- **이슈 및 기능**: [GitHub Issues](https://github.com/spilist/get-images/issues)
-- **개발 가이드**: 가이드라인은 `CLAUDE.md` 확인
-- **API 문서**: [SERPAPI 문서](https://serpapi.com/search-api)
+[MIT 라이선스](LICENSE) 하의 오픈소스.

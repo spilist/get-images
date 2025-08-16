@@ -40,33 +40,54 @@ Alternative package managers can be used, but pnpm is recommended for consistenc
 
 ## Architecture
 
+### Project Structure
+
+The project follows a clean architecture with separation of concerns:
+
+```
+get-images/
+├── src/
+│   ├── app/                 # Next.js App Router
+│   │   ├── api/scraper/     # API endpoint (SERPAPI)
+│   │   ├── api/usage/       # API key usage monitoring
+│   │   └── page.tsx         # Main application
+│   ├── components/ui/       # shadcn/ui components
+│   ├── lib/                 # Core utilities
+│   │   ├── serpapi.service.ts  # SERPAPI integration and error handling
+│   │   ├── cache.ts         # Intelligent caching system
+│   │   └── api-key-storage.ts  # Secure API key management
+│   ├── hooks/               # React hooks with centralized logic
+│   │   └── use-image-search.ts # Search functionality and API key management
+│   └── types/               # TypeScript definitions
+├── __tests__/               # Comprehensive test suite
+├── scripts/
+│   └── scraper.py          # CLI script (DuckDuckGo)
+└── requirements.txt        # Python dependencies
+```
+
 ### Dual API Approach
+
 The project uses different image search APIs for different contexts:
 - **Web Application**: SERPAPI (Google Images) via Next.js API routes
 - **CLI Script**: DuckDuckGo Search via Python `ddgs` package
 
-### Frontend Structure
+### Frontend Architecture
+
 - **Framework**: TypeScript/React with Next.js 15 App Router
 - **UI**: shadcn/ui components with Tailwind CSS
 - **API Key Management**: Type-safe handling via `ApiKeyConfig` interface
 - **Components**: Located in `src/components/ui/`
 - **Hooks**: Business logic abstracted in `src/hooks/`
 
-### API Structure
-- `src/app/api/scraper/route.ts` - Main image search API endpoint
-- `src/app/api/usage/route.ts` - API key usage monitoring endpoint
-- `src/lib/serpapi.service.ts` - SERPAPI integration and error handling
-- `src/hooks/use-image-search.ts` - Search functionality and API key management
-- `scripts/scraper.py` - Standalone Python CLI script using DuckDuckGo
-- `requirements.txt` - Python dependencies for CLI usage
-
 ### Key Features
+
 - **API Key Management**: Support for environment and user-provided SERPAPI keys
 - **Intelligent Caching**: In-memory cache reduces API calls and improves performance
 - **Error Handling**: Pattern-based error mapping with user-friendly messages
 - **Usage Monitoring**: Real-time API key quota tracking
 
-### API Endpoints
+## API Endpoints
+
 - `POST /api/scraper` - Main image search API
   - Supports single/multiple keyword searches
   - Optional user API key via headers or body
@@ -74,12 +95,15 @@ The project uses different image search APIs for different contexts:
   - Returns quota and usage statistics
   - Supports `X-API-Key` header for user keys
 
+## Configuration
+
 ### Environment Setup
+
 1. Set `SERPAPI_KEY` environment variable
 2. Optionally set `SERPAPI_KEY2` for automatic key rotation  
 3. Users can override with personal keys via Settings UI
 
-## API Key Management
+### API Key Management
 
 **Type Safety**: Uses `ApiKeyConfig` interface for consistent key handling:
 ```typescript
@@ -96,52 +120,26 @@ interface ApiKeyConfig {
 - Automatic fallback from user → environment keys
 - Keys stored in localStorage with XSS security warnings
 
-## Caching System
+### Caching System
 
 In-memory caching implemented in `src/lib/cache.ts`:
 - **TTL**: 24-hour cache for search results
 - **Key Strategy**: `${query}:${max_results}:${api_key_hash}`
 - **Benefits**: Eliminates duplicate API calls, improves performance
 
-## Error Handling System
+### Error Handling System
 
 Pattern-based error mapping in `src/lib/serpapi.service.ts` using `SERPAPI_ERROR_MAP`:
 - Context-aware messages (different for user vs environment keys)  
 - Handles API key issues, quota limits, service errors
 - Uses `getValidApiKey()` to find non-exhausted keys automatically
 
-## API Usage Monitoring
+### API Usage Monitoring
 
 `GET /api/usage` endpoint provides key usage statistics:
 - Returns remaining quotas and current usage
 - Used by Settings dialog and `getValidApiKey()` function  
 - Supports `X-API-Key` header for user-specific checks
-
-## Deployment
-
-Vercel deployment ready with environment variable support for `SERPAPI_KEY`.
-
-## UI/UX Guidelines
-
-- All buttons should have `cursor: pointer`
-
-## Documentation Maintenance
-
-This project maintains documentation in both English and Korean:
-- **English**: `README.md` - Primary documentation
-- **Korean**: `README.ko.md` - Korean translation
-
-**Important**: When updating documentation, you MUST update BOTH files to maintain consistency:
-1. Update the English `README.md` first
-2. Apply equivalent changes to the Korean `README.ko.md`
-3. Ensure section structure and content parity between both versions
-4. Maintain consistent formatting and styling across languages
-
-**Translation Guidelines**:
-- Technical terms may remain in English when commonly used (e.g., API, CLI, TypeScript)
-- Code examples and commands should remain identical in both versions
-- Links to external resources should use the same URLs unless Korean-specific alternatives exist
-- Environment variable names and configuration examples must be identical
 
 ## Development Guidelines
 
@@ -266,3 +264,29 @@ pnpm test:coverage:ci  # Coverage for CI reporting
 - No failing tests allowed in main branch
 - Minimum 85% coverage for modified files
 - Tests must be readable and follow AAA pattern (Arrange, Act, Assert)
+
+## Deployment
+
+Vercel deployment ready with environment variable support for `SERPAPI_KEY`.
+
+## UI/UX Guidelines
+
+- All buttons should have `cursor: pointer`
+
+## Documentation Maintenance
+
+This project maintains documentation in both English and Korean:
+- **English**: `README.md` - Primary documentation
+- **Korean**: `README.ko.md` - Korean translation
+
+**Important**: When updating documentation, you MUST update BOTH files to maintain consistency:
+1. Update the English `README.md` first
+2. Apply equivalent changes to the Korean `README.ko.md`
+3. Ensure section structure and content parity between both versions
+4. Maintain consistent formatting and styling across languages
+
+**Translation Guidelines**:
+- Technical terms may remain in English when commonly used (e.g., API, CLI, TypeScript)
+- Code examples and commands should remain identical in both versions
+- Links to external resources should use the same URLs unless Korean-specific alternatives exist
+- Environment variable names and configuration examples must be identical

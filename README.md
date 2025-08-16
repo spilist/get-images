@@ -18,11 +18,9 @@ A modern, intelligent web application for searching and collecting images from m
 - **Export Functionality**: Easy copy/export of results
 - **Internationalization**: Full support for Korean and English languages
 
----
-
 ## 🚀 Quick Start
 
-### Option 1: Web Application (Recommended)
+### Web Application (Recommended)
 
 ```bash
 # Clone and install
@@ -36,7 +34,7 @@ pnpm dev
 # Open http://localhost:3000
 ```
 
-### Option 2: CLI Script (No API Key Required)
+### CLI Script (No API Key Required)
 
 ```bash
 # Install Python dependencies
@@ -50,11 +48,9 @@ python scripts/scraper.py
 
 > **⚠️ IMPORTANT**: The CLI script will display a disclaimer about image usage rights. It is your responsibility to verify copyright permissions and licensing before using any images found through this tool. Additionally, many image links may not work outside their original websites due to hotlinking protection - always test each link in your target environment.
 
----
-
 ## ⚙️ Configuration
 
-### SERPAPI Setup (Web Interface)
+### SERPAPI Setup
 
 1. **Get API Key**: Sign up at [serpapi.com/manage-api-key](https://serpapi.com/manage-api-key)
 2. **Configure in App**: Use settings UI to enter your key
@@ -63,30 +59,6 @@ python scripts/scraper.py
    SERPAPI_KEY=your_primary_key_here
    SERPAPI_KEY2=your_secondary_key_here  # Optional: enables auto-rotation
    ```
-
-### Analytics Configuration (Optional)
-
-GetImages supports web analytics integration for user behavior tracking:
-
-```bash
-# Google Analytics
-NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX  # Your Google Analytics 4 Measurement ID
-
-# Microsoft Clarity
-NEXT_PUBLIC_CLARITY_PROJECT_ID=xxxxxxxxx  # Your Clarity Project ID
-```
-
-**Analytics Features**:
-- **Google Analytics 4**: Page views, user engagement, and conversion tracking
-- **Microsoft Clarity**: Heatmaps, session recordings, and user behavior insights
-- **Privacy-Friendly**: Only loads when environment variables are configured
-- **Production-Ready**: Optimized loading strategies using Next.js Script component
-
-**Setup Instructions**:
-1. **Google Analytics**: Get your Measurement ID from [Google Analytics](https://analytics.google.com/)
-2. **Microsoft Clarity**: Get your Project ID from [Clarity Dashboard](https://clarity.microsoft.com/)
-3. Add the respective environment variables to your `.env.local` file
-4. Analytics will automatically start tracking once configured
 
 **API Key Rotation**: Configure multiple keys for automatic load balancing and rate limit distribution.
 
@@ -126,6 +98,30 @@ GetImages supports two search engine modes, each optimized for different use cas
 
 **Configuration**: Change engine in Settings → Search Options → Search Engine
 
+### Analytics Configuration (Optional)
+
+GetImages supports web analytics integration for user behavior tracking:
+
+```bash
+# Google Analytics
+NEXT_PUBLIC_GA_ID=G-XXXXXXXXXX  # Your Google Analytics 4 Measurement ID
+
+# Microsoft Clarity
+NEXT_PUBLIC_CLARITY_PROJECT_ID=xxxxxxxxx  # Your Clarity Project ID
+```
+
+**Analytics Features**:
+- **Google Analytics 4**: Page views, user engagement, and conversion tracking
+- **Microsoft Clarity**: Heatmaps, session recordings, and user behavior insights
+- **Privacy-Friendly**: Only loads when environment variables are configured
+- **Production-Ready**: Optimized loading strategies using Next.js Script component
+
+**Setup Instructions**:
+1. **Google Analytics**: Get your Measurement ID from [Google Analytics](https://analytics.google.com/)
+2. **Microsoft Clarity**: Get your Project ID from [Clarity Dashboard](https://clarity.microsoft.com/)
+3. Add the respective environment variables to your `.env.local` file
+4. Analytics will automatically start tracking once configured
+
 ### Internationalization (i18n)
 
 GetImages provides full internationalization support with seamless language switching:
@@ -153,46 +149,7 @@ GetImages provides full internationalization support with seamless language swit
 For detailed information about image filters (licenses, sizes, types, etc.), visit:
 [SERPAPI Google Images API Documentation](https://serpapi.com/google-images-api)
 
----
-
-## ⚡ Performance Features
-
-### Intelligent Caching System
-
-Our advanced caching system delivers significant performance improvements:
-
-| Feature | Benefit |
-|---------|---------|
-| **Instant Results** | Cached searches return in <10ms |
-| **Cost Savings** | Eliminates duplicate API calls |
-| **Rate Limit Protection** | Reduces API usage |
-| **Smart Keys** | Considers query + result count + API key |
-
-**Example**: Popular searches like "김치찌개" load instantly after first search!
-
----
-
-## 🛠️ Development
-
-```bash
-# Development with hot reload
-pnpm dev
-
-# Production build
-pnpm build
-
-# Production server
-pnpm start
-
-# Code linting
-pnpm lint
-
-# Testing
-pnpm test          # Run all tests
-pnpm test:watch    # Run tests in watch mode
-pnpm test:coverage # Run tests with coverage report
-pnpm test:ci       # Run tests for CI
-```
+## 🛡️ Architecture
 
 ### Project Structure
 
@@ -220,36 +177,78 @@ get-images/
 └── requirements.txt        # Python dependencies
 ```
 
-### 🛡️ Architecture Overview
+### Core Features
 
-**Type-Safe API Key Management**:
+**⚡ Intelligent Caching System**
+
+Our advanced caching system delivers significant performance improvements:
+
+| Feature | Benefit |
+|---------|---------|
+| **Instant Results** | Cached searches return in <10ms |
+| **Cost Savings** | Eliminates duplicate API calls |
+| **Rate Limit Protection** | Reduces API usage |
+| **Smart Keys** | Considers query + result count + API key |
+
+**Example**: Popular searches like "김치찌개" load instantly after first search!
+
+**🔧 Type-Safe API Key Management**:
 - Consistent key handling through `ApiKeyConfig` interface
 - Centralized logic in `useImageSearch` hook
 - Support for both environment and user-provided keys
 
-**Intelligent Error Handling**:
+**🛠️ Intelligent Error Handling**:
 - Pattern-based error mapping in `SERPAPI_ERROR_MAP`
 - Context-aware error messages for different scenarios
 - Graceful fallback for various API failure conditions
 
-**Smart Key Selection**:
+**📊 Smart Key Selection**:
 - Usage-based validation prioritizes functional keys
 - Automatic exclusion of exhausted keys
 - Real-time monitoring of key status and quotas
 
----
+## 🛠️ Development
 
-## 🧪 Testing
+```bash
+# Development with hot reload
+pnpm dev
+
+# Production build
+pnpm build
+
+# Production server
+pnpm start
+
+# Code linting
+pnpm lint
+
+# Testing
+pnpm test          # Run all tests
+pnpm test:watch    # Run tests in watch mode
+pnpm test:coverage # Run tests with coverage report
+pnpm test:ci       # Run tests for CI
+```
+
+### Testing Infrastructure
 
 GetImages includes a comprehensive testing infrastructure built with **Jest**, **React Testing Library**, and **MSW** for reliable code quality and user workflow validation.
 
-### Testing Framework
+**Testing Framework**:
 - **Jest 30+** with Next.js 15 and TypeScript support
 - **React Testing Library** for component and hook testing
 - **MSW (Mock Service Worker)** for SERPAPI response mocking
 - **140+ test cases** covering critical user workflows
 
-### Running Tests
+**Test Coverage**:
+
+| Component | Coverage Focus |
+|-----------|----------------|
+| **Hook Tests** | Image search, API key management, search history |
+| **Service Tests** | SERPAPI integration, caching, error handling |
+| **API Tests** | Search endpoints, usage monitoring |
+| **Integration Tests** | End-to-end user workflows |
+
+**Running Tests**:
 
 ```bash
 # Run all tests
@@ -265,16 +264,7 @@ pnpm test:coverage
 pnpm test:ci
 ```
 
-### Test Coverage
-
-| Component | Coverage Focus |
-|-----------|----------------|
-| **Hook Tests** | Image search, API key management, search history |
-| **Service Tests** | SERPAPI integration, caching, error handling |
-| **API Tests** | Search endpoints, usage monitoring |
-| **Integration Tests** | End-to-end user workflows |
-
-### Test Architecture
+**Test Architecture**:
 
 ```
 __tests__/
@@ -285,14 +275,12 @@ __tests__/
 └── fixtures/       # Mock data and realistic test scenarios
 ```
 
-### Key Testing Features
+**Key Testing Features**:
 - **Realistic Data**: Uses Korean food keywords (삼계탕, 김치찌개) for authentic testing
 - **API Mocking**: Complete SERPAPI response simulation with MSW
 - **Error Scenarios**: Tests API exhaustion, rate limiting, and invalid keys
 - **TypeScript Safety**: Full type checking in all test files
 - **CI Integration**: Automated testing with coverage reporting
-
----
 
 ## 🔧 API Usage
 
@@ -326,8 +314,6 @@ const response = await fetch('/api/scraper', {
 });
 ```
 
----
-
 ## 🚀 Deployment
 
 ### Vercel (Recommended)
@@ -344,8 +330,6 @@ const response = await fetch('/api/scraper', {
 
 Standard Next.js application - compatible with any Node.js hosting platform.
 
----
-
 ## 🤖 AI Development
 
 This project leverages advanced AI coding agents with semantic analysis:
@@ -354,8 +338,6 @@ This project leverages advanced AI coding agents with semantic analysis:
 - **[Serena MCP](https://github.com/oraios/serena)** - Advanced semantic code analysis for TypeScript/JavaScript
 
 **Learn More**: [Serena MCP Guide](https://hansdev.kr/tech/serena-mcp/) - Comprehensive blog post on maximizing productivity with semantic analysis.
-
----
 
 ## ⚠️ Image Usage Disclaimer
 
@@ -383,22 +365,12 @@ This project leverages advanced AI coding agents with semantic analysis:
 
 This tool does not grant any rights to use the images found. All copyright and intellectual property rights remain with their respective owners.
 
----
-
 ## 🤝 Contributing
 
 1. Fork the repository
 2. Create feature branch: `git checkout -b feature-name`  
 3. Make changes and test thoroughly
 4. Submit pull request
-
----
-
-## 📄 License
-
-Open source under the [MIT License](LICENSE).
-
----
 
 ## 💝 Support
 
@@ -408,10 +380,6 @@ Find this project helpful? Consider supporting its development:
 
 Created by [배휘동](https://stdy.blog)
 
----
+## 📄 License
 
-## 📚 Resources
-
-- **Issues & Features**: [GitHub Issues](https://github.com/spilist/get-images/issues)
-- **Development Guide**: Check `CLAUDE.md` for guidelines  
-- **API Documentation**: [SERPAPI Docs](https://serpapi.com/search-api)
+Open source under the [MIT License](LICENSE).
